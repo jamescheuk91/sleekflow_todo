@@ -37,6 +37,7 @@ defmodule SleekFlowTodo.Todos.Aggregates.Todo do
       todo_id: todo_id,
       name: name,
       description: description,
+      status: :not_started,
       due_date: due_date,
       added_at: added_at
     }

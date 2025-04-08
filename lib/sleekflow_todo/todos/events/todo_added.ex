@@ -3,12 +3,13 @@ defmodule SleekFlowTodo.Todos.Events.TodoAdded do
   Event dispatched when a new todo item has been added.
   """
   @derive Jason.Encoder
-  defstruct [:todo_id, :name, :description, :due_date, :added_at]
+  defstruct [:todo_id, :name, :description, :status, :due_date, :added_at]
 
   @type t :: %__MODULE__{
           todo_id: String.t(),
           name: String.t(),
           description: String.t(),
+          status: String.t(),
           due_date: DateTime.t(),
           added_at: DateTime.t()
         }

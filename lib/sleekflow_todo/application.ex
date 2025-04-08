@@ -12,6 +12,7 @@ defmodule SleekFlowTodo.Application do
       SleekFlowTodoWeb.Telemetry,
       SleekFlowTodo.ProjectionRepo,
       SleekFlowTodo.CommandedApplication,
+      SleekFlowTodo.Todos.TodoReadModelProjector,
       {Phoenix.PubSub, name: SleekFlowTodo.PubSub},
       # Start Finch
       {Finch, name: SleekFlowTodo.Finch},
