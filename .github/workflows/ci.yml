@@ -45,4 +45,17 @@ jobs:
       - name: Run tests
         run: mix test
         env:
-          MIX_ENV: test 
+          MIX_ENV: test
+
+  deploy:
+    name: Deploy app
+    needs: build_and_test  # Wait for build_and_test to succeed
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' # Only run on push to main
+    concurrency: deploy-group    # optional: ensure only one action runs at a time
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }} 
