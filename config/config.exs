@@ -10,7 +10,8 @@ import Config
 config :sleekflow_todo, SleekFlowTodo.CommandedApplication,
   event_store: [
     adapter: Commanded.EventStore.Adapters.EventStore,
-    event_store: SleekFlowTodo.EventStore
+    event_store: SleekFlowTodo.EventStore,
+    serializer: Commanded.Serialization.JsonSerializer
   ],
   pubsub: :local,
   registry: :local

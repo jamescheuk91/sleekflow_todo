@@ -23,12 +23,21 @@ defmodule SleekFlowTodo.DataCase do
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
+      import Commanded.Assertions.EventAssertions
       import SleekFlowTodo.DataCase
     end
   end
 
   setup tags do
+    require Logger
+    # Set up the sandbox first to ensure the connection is checked out
     SleekFlowTodo.DataCase.setup_sandbox(tags)
+
+    Logger.info("--- Test Setup: Starting Storage Reset ---")
+    # Explicitly reset storage before each test, now that sandbox is ready
+    SleekFlowTodo.TestSupport.Storage.reset!()
+    Logger.info("--- Test Setup: Storage Reset Complete ---")
+
     :ok
   end
 
@@ -36,8 +45,18 @@ defmodule SleekFlowTodo.DataCase do
   Sets up the sandbox based on the test tags.
   """
   def setup_sandbox(tags) do
+    {:ok, _} = Application.ensure_all_started(:sleekflow_todo)
+
     pid = Ecto.Adapters.SQL.Sandbox.start_owner!(SleekFlowTodo.ProjectionRepo, shared: not tags[:async])
-    on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+    on_exit(fn ->
+      Ecto.Adapters.SQL.Sandbox.stop_owner(pid)
+      case Application.stop(:sleekflow_todo) do
+        :ok -> :ok
+        {:error, reason} ->
+          IO.puts("Error stopping sleekflow_todo: #{inspect(reason)}")
+          :ok
+      end
+    end)
   end
 
   @doc """
