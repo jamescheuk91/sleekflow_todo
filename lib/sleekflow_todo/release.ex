@@ -44,10 +44,6 @@ defmodule SleekFlowTodo.Release do
     case EventStore.Tasks.Init.exec(config) do
       :ok ->
         IO.puts("EventStore database initialized or already initialized.")
-
-      {:error, reason} ->
-        IO.puts("Failed to initialize EventStore database: #{inspect(reason)}")
-        System.halt(1)
     end
   end
 
