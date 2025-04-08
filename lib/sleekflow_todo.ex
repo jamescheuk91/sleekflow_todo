@@ -1,6 +1,6 @@
-defmodule Todo do
+defmodule SleekFlow do
   @moduledoc """
-  Todo keeps the contexts that define your domain
+  SleekFlow keeps the contexts that define your domain
   and business logic.
 
   Contexts are also responsible for managing your data, regardless

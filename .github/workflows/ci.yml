@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build_and_test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.18.3' # Adjust Elixir version as needed
+          otp-version: '27.3'    # Adjust OTP version as needed
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v3
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-
+
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Compile application
+        run: mix compile --warnings-as-errors
+
+      - name: Setup test eventstore database and projection repo database
+        run: |
+          mix event_store.setup
+          mix ecto.setup
+        env:
+          MIX_ENV: test
+
+      - name: Run tests
+        run: mix test
+        env:
+          MIX_ENV: test 
