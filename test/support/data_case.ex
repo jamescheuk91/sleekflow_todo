@@ -56,6 +56,11 @@ defmodule SleekFlowTodo.DataCase do
       )
     on_exit(fn ->
       Logger.debug("--- Test on exit ---")
+
+      Logger.info("--- Test Setup: Starting Storage Reset ---")
+      # Explicitly reset storage before each test, now that sandbox is ready
+      SleekFlowTodo.TestSupport.Storage.reset!()
+      Logger.info("--- Test Setup: Storage Reset Complete ---")
       Ecto.Adapters.SQL.Sandbox.stop_owner(pid)
 
       case Application.stop(:sleekflow_todo) do

@@ -28,7 +28,8 @@ config :sleekflow_todo, SleekFlowTodoWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [html: SleekFlowTodoWeb.ErrorHTML, json: SleekFlowTodoWeb.ErrorJSON],
+    formats: [html: SleekFlowTodoWeb.ErrorHTML,
+    json: SleekFlowTodoWeb.ErrorJSON],
     layout: false
   ],
   pubsub_server: SleekFlowTodo.PubSub,

@@ -5,31 +5,92 @@ defmodule SleekFlowTodo.TodosTest do
   # alias SleekFlowTodo.Todos.Commands.AddTodo <- No longer needed directly
   alias SleekFlowTodo.Todos.Events.TodoAdded
   # alias SleekFlowTodo.CommandedApplication <- No longer needed directly
+  describe "add_todo/1" do
+    test "ensure add_todo/1 publishes a TodoAdded event" do
+      next_day = DateTime.add(DateTime.utc_now(), 1, :day)
 
-  test "ensure add_todo/1 publishes a TodoAdded event" do
-    next_day = DateTime.add(DateTime.utc_now(), 1, :day)
-    next_day_string = DateTime.to_iso8601(next_day)
-    now = DateTime.utc_now()
-    now_string = DateTime.to_iso8601(now)
+      attrs = %{
+        name: "buy milk 1",
+        description: "Buy milk description 1",
+        due_date: next_day
+      }
 
-    attrs = %{
-      name: "buy milk",
-      description: "Buy milk description",
-      due_date: next_day_string,
-      added_at: now_string
-    }
+      # Call context function and assert correct return
+      assert {:ok, todo_id} = Todos.add_todo(attrs)
 
-    # Call context function and assert correct return
-    assert {:ok, todo_id} = Todos.add_todo(attrs)
+      # Increase timeout significantly
+      assert_receive_event(SleekFlowTodo.CommandedApplication, TodoAdded,
+      fn event -> event.todo_id == todo_id end,
+      fn event ->
+        assert event.name == "buy milk 1"
+        assert event.description == "Buy milk description 1"
+        assert event.due_date == next_day
+        assert event.added_at
+      end)
+    end
 
-    # Increase timeout significantly
-    assert_receive_event(SleekFlowTodo.CommandedApplication, TodoAdded, fn event ->
-      # Assert todo_id from context matches event
-      assert event.todo_id == todo_id
-      assert event.name == "buy milk"
-      assert event.description == "Buy milk description"
-      assert event.due_date == next_day
-      assert event.added_at == now
-    end)
+    test "returns an error when the command is invalid (name is too short)" do
+      next_day = DateTime.add(DateTime.utc_now(), 1, :day)
+
+      attrs = %{
+        name: "b",
+        due_date: next_day
+      }
+
+      assert {:error, error_details} = Todos.add_todo(attrs)
+      assert error_details == {:name, "Name must be at least 2 characters"}
+    end
+
+    test "returns an error when the command is invalid (description is too short)" do
+      next_day = DateTime.add(DateTime.utc_now(), 1, :day)
+
+      attrs = %{
+        name: "buy milk",
+        description: "d",
+        due_date: next_day
+      }
+
+      assert {:error, error_details} = Todos.add_todo(attrs)
+      assert error_details == {:description, "Description must be at least 2 characters"}
+    end
+
+    test "returns an error when the due date is in the past" do
+      yesterday = DateTime.add(DateTime.utc_now(), -1, :day)
+
+      attrs = %{
+        name: "buy milk",
+        description: "Buy milk description",
+        due_date: yesterday
+      }
+
+      assert {:error, error_details} = Todos.add_todo(attrs)
+      assert error_details == {:due_date, "Due date must be in the future"}
+    end
+
+    test "returns an error when the command is invalid (due date is not a DateTime)" do
+      attrs = %{
+        name: "buy milk",
+        description: "Buy milk description",
+        due_date: "not a DateTime"
+      }
+
+      assert {:error, error_details} = Todos.add_todo(attrs)
+      assert error_details == {:due_date, "Invalid due date format"}
+    end
+
+    test "returns a list of errors when multiple commands are invalid" do
+      attrs = %{
+        name: "b",
+        description: "d",
+        due_date: "not a DateTime"
+      }
+
+      assert {:error, error_details} = Todos.add_todo(attrs)
+      assert error_details == [
+        {:name, "Name must be at least 2 characters"},
+        {:description, "Description must be at least 2 characters"},
+        {:due_date, "Invalid due date format"}
+      ]
+    end
   end
 end

@@ -1,14 +1,16 @@
 defmodule SleekFlowTodo.Todos.Commands.AddTodo do
   @moduledoc """
-  Command to add a new todo item.
+  A struct representingCommand to add a new todo item.
   """
-  defstruct [:todo_id, :name, :description, :due_date, added_at: DateTime.utc_now()]
 
-  @type t :: %__MODULE__{
-          todo_id: String.t(),
-          name: String.t(),
-          description: String.t(),
-          due_date: DateTime.t(),
-          added_at: DateTime.t()
-        }
+  use TypedStruct
+
+  typedstruct do
+    @typedoc "A command to add a new todo item."
+    field :todo_id, String.t(), enforce: true
+    field :name, String.t(), enforce: true
+    field :description, String.t()
+    field :due_date, DateTime.t()
+    field :added_at, DateTime.t(), enforce: true
+  end
 end

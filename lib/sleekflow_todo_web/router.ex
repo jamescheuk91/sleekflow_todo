@@ -21,9 +21,11 @@ defmodule SleekFlowTodoWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", SleekFlowTodoWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", SleekFlowTodoWeb do
+    pipe_through :api
+
+    resources "/todos", TodoController
+  end
 
   # Enable LiveDashboard in development
   if Application.compile_env(:sleekflow_todo, :dev_routes) do
