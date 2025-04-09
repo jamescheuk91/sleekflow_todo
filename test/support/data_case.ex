@@ -15,6 +15,7 @@ defmodule SleekFlowTodo.DataCase do
   """
 
   use ExUnit.CaseTemplate
+  require Logger
 
   using do
     quote do
@@ -23,12 +24,24 @@ defmodule SleekFlowTodo.DataCase do
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
+      import Commanded.Assertions.EventAssertions
       import SleekFlowTodo.DataCase
     end
   end
 
   setup tags do
-    SleekFlowTodo.DataCase.setup_sandbox(tags)
+    require Logger
+    # Set up the sandbox first and capture the owner PID
+    {:ok, owner_pid: owner_pid} = SleekFlowTodo.DataCase.setup_sandbox(tags)
+
+    # Allow the test process itself to use the connection owned by owner_pid
+    Ecto.Adapters.SQL.Sandbox.allow(SleekFlowTodo.ProjectionRepo, self(), owner_pid)
+
+    Logger.info("--- Test Setup: Starting Storage Reset ---")
+    # Explicitly reset storage before each test, now that sandbox is ready
+    SleekFlowTodo.TestSupport.Storage.reset!()
+    Logger.info("--- Test Setup: Storage Reset Complete ---")
+
     :ok
   end
 
@@ -36,8 +49,33 @@ defmodule SleekFlowTodo.DataCase do
   Sets up the sandbox based on the test tags.
   """
   def setup_sandbox(tags) do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(SleekFlowTodo.ProjectionRepo, shared: not tags[:async])
-    on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+    {:ok, _} = Application.ensure_all_started(:sleekflow_todo)
+
+    pid =
+      Ecto.Adapters.SQL.Sandbox.start_owner!(SleekFlowTodo.ProjectionRepo,
+        shared: not tags[:async]
+      )
+
+    on_exit(fn ->
+      Logger.debug("--- Test on exit ---")
+
+      Logger.info("--- Test Setup: Starting Storage Reset ---")
+      # Explicitly reset storage before each test, now that sandbox is ready
+      SleekFlowTodo.TestSupport.Storage.reset!()
+      Logger.info("--- Test Setup: Storage Reset Complete ---")
+      Ecto.Adapters.SQL.Sandbox.stop_owner(pid)
+
+      case Application.stop(:sleekflow_todo) do
+        :ok ->
+          :ok
+
+        {:error, reason} ->
+          IO.puts("Error stopping sleekflow_todo: #{inspect(reason)}")
+          :ok
+      end
+    end)
+
+    {:ok, owner_pid: pid}
   end
 
   @doc """

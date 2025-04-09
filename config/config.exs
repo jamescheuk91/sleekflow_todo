@@ -10,7 +10,8 @@ import Config
 config :sleekflow_todo, SleekFlowTodo.CommandedApplication,
   event_store: [
     adapter: Commanded.EventStore.Adapters.EventStore,
-    event_store: SleekFlowTodo.EventStore
+    event_store: SleekFlowTodo.EventStore,
+    serializer: Commanded.Serialization.JsonSerializer
   ],
   pubsub: :local,
   registry: :local
@@ -27,7 +28,8 @@ config :sleekflow_todo, SleekFlowTodoWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [html: SleekFlowTodoWeb.ErrorHTML, json: SleekFlowTodoWeb.ErrorJSON],
+    formats: [html: SleekFlowTodoWeb.ErrorHTML,
+    json: SleekFlowTodoWeb.ErrorJSON],
     layout: false
   ],
   pubsub_server: SleekFlowTodo.PubSub,

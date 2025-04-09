@@ -60,6 +60,7 @@ defmodule SleekFlowTodo.MixProject do
       {:bandit, "~> 1.5"},
       {:sentry, "~> 10.2.0"},
       {:hackney, "~> 1.8"},
+      {:typed_struct, "~> 0.3.0"},
       {:eventstore, "~> 1.4.8"},
       {:commanded, "~> 1.4.3"},
       {:commanded_eventstore_adapter, "~> 1.4.1"},

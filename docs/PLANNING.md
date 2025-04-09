@@ -76,12 +76,12 @@ end
 
 ## API Endpoints
 
-### Todo Endpoints
-- `GET /api/todos` - List all todos (with filtering/sorting)
-- `GET /api/todos/:id` - Get a specific todo
-- `POST /api/todos` - Create a new todo
-- `PUT /api/todos/:id` - Update a todo
-- `DELETE /api/todos/:id` - Delete a todo
+### Todo Lists Endpoints
+- `GET /api/todos` - List all todo items for given user(with filtering/sorting)
+- `GET /api/todos/:id` - Get a specific todo item
+- `POST /api/todos` - Create a new todo item
+- `PUT /api/todos/:id` - Update a todo item
+- `DELETE /api/todos/:id` - Delete a todo item
 
 ### Authentication Endpoints (Extended)
 - `POST /api/users/register` - Register a new user

@@ -1,5 +1,5 @@
 defmodule SleekFlowTodoWeb.ErrorJSONTest do
-  use SleekFlowTodoWeb.ConnCase, async: true
+  use SleekFlowTodoWeb.ConnCase
 
   test "renders 404" do
     assert SleekFlowTodoWeb.ErrorJSON.render("404.json", %{}) == %{errors: %{detail: "Not Found"}}
