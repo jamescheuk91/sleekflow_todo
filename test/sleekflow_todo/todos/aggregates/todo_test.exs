@@ -17,6 +17,7 @@ defmodule SleekFlowTodo.Todos.Aggregates.TodoTest do
     assert event.description == "Buy milk description"
     assert event.due_date == next_day
     assert event.added_at == now
+    assert event.status == :not_started
   end
 
   test "apply/2 TodoAdded event to Todo aggregate" do
