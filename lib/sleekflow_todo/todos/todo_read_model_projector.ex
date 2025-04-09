@@ -2,7 +2,8 @@ defmodule SleekFlowTodo.Todos.TodoReadModelProjector do
   use Commanded.Projections.Ecto,
     application: SleekFlowTodo.CommandedApplication,
     repo: SleekFlowTodo.ProjectionRepo,
-    name: "TodosTodoReadModelProjector"
+    name: "TodosTodoReadModelProjector",
+    consistency: :strong
 
   require Logger
 

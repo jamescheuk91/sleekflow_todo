@@ -5,6 +5,38 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
+  describe "index todos" do
+    test "renders todo items", %{conn: conn} do
+      todo_attr1 = %{name: "task one"}
+      todo_attr2 = %{name: "task two"}
+      # Create two todos
+      {:ok, todo_id1} = SleekFlowTodo.Todos.add_todo(todo_attr1)
+      {:ok,todo_id2} = SleekFlowTodo.Todos.add_todo(todo_attr2)
+
+      # Make the request to get all todos
+      conn = get(conn, ~p"/api/todos")
+
+      # Assert the response
+      response = json_response(conn, 200)["data"]
+      |> IO.inspect()
+      assert is_list(response)
+      assert length(response) == 2
+
+      # Extract todos with their names and IDs
+      todo1 = Enum.find(response, fn todo -> todo["id"] == todo_id1 end)
+      todo2 = Enum.find(response, fn todo -> todo["id"] == todo_id2 end)
+
+      # Verify both todos exist
+      assert todo1 != nil
+      assert todo2 != nil
+
+      # Verify names match with correct IDs (not mixed up)
+      assert todo1["name"] == "task one"
+      assert todo2["name"] == "task two"
+
+    end
+  end
+
   describe "create todo" do
     test "renders todo id", %{conn: conn} do
       attrs = %{name: "Test Todo"}

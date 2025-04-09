@@ -5,7 +5,9 @@ defmodule SleekFlowTodo.Todos do
   require Logger
 
   alias SleekFlowTodo.CommandedApplication
+  alias SleekFlowTodo.ProjectionRepo
   alias SleekFlowTodo.Todos.Commands.AddTodo
+  alias SleekFlowTodo.Todos.TodoReadModel
 
   @doc """
   Adds a new todo item.
@@ -80,4 +82,11 @@ defmodule SleekFlowTodo.Todos do
   #   # Generic build error
   #   {:error, "Failed to create command: #{inspect(other_reason)}"}
   # end
+
+  @doc """
+  Returns a list of all todo items from the read model.
+  """
+  def list_todos() do
+    ProjectionRepo.all(TodoReadModel)
+  end
 end

@@ -2,8 +2,16 @@ defmodule SleekFlowTodoWeb.TodoController do
   use SleekFlowTodoWeb, :controller
   require Logger
   alias SleekFlowTodo.Todos
+  alias SleekFlowTodoWeb.TodoJSON
 
   action_fallback SleekFlowTodoWeb.FallbackController
+
+  def index(conn, _params) do
+    todos = Todos.list_todos()
+    conn
+    |> put_view(json: TodoJSON)
+    render(conn, :index, todos: todos)
+  end
 
   def create(conn, %{"todo" => todo_params}) do
     params = SleekFlowTodo.Utils.key_to_atom(todo_params)
@@ -21,7 +29,7 @@ defmodule SleekFlowTodoWeb.TodoController do
         |> put_view(json: SleekFlowTodoWeb.ErrorJSON)
         |> render(:error, reason: reason)
     end
-    end
+  end
 
   defp parse_due_date(params) do
     if Map.has_key?(params, :due_date) and is_binary(params.due_date) do
