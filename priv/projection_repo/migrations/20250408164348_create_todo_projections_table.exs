@@ -4,9 +4,9 @@ defmodule SleekFlowTodo.ProjectionRepo.Migrations.CreateTodoProjectionsTable do
   def change do
     create table(:todos, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :name, :string
+      add :name, :string, null: false
       add :description, :string
-      add :status, :string
+      add :status, :string, null: false
       add :due_date, :utc_datetime_usec
       add :added_at, :utc_datetime_usec
 
