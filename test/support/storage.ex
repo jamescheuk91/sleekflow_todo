@@ -7,7 +7,7 @@ defmodule SleekFlowTodo.TestSupport.Storage do
 
   def reset! do
     reset_eventstore()
-    # reset_readstore()
+    reset_readstore()
   end
 
   defp reset_eventstore do
@@ -28,6 +28,7 @@ defmodule SleekFlowTodo.TestSupport.Storage do
   defp truncate_readstore_tables do
     """
     TRUNCATE TABLE
+    todos
     RESTART IDENTITY
     CASCADE;
     """

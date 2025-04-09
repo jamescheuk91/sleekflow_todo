@@ -15,7 +15,7 @@ defmodule SleekFlowTodo.DataCase do
   """
 
   use ExUnit.CaseTemplate
-
+  require Logger
   using do
     quote do
       alias SleekFlowTodo.ProjectionRepo
@@ -30,8 +30,11 @@ defmodule SleekFlowTodo.DataCase do
 
   setup tags do
     require Logger
-    # Set up the sandbox first to ensure the connection is checked out
-    SleekFlowTodo.DataCase.setup_sandbox(tags)
+    # Set up the sandbox first and capture the owner PID
+    {:ok, owner_pid: owner_pid} = SleekFlowTodo.DataCase.setup_sandbox(tags)
+
+    # Allow the test process itself to use the connection owned by owner_pid
+    Ecto.Adapters.SQL.Sandbox.allow(SleekFlowTodo.ProjectionRepo, self(), owner_pid)
 
     Logger.info("--- Test Setup: Starting Storage Reset ---")
     # Explicitly reset storage before each test, now that sandbox is ready
@@ -47,16 +50,24 @@ defmodule SleekFlowTodo.DataCase do
   def setup_sandbox(tags) do
     {:ok, _} = Application.ensure_all_started(:sleekflow_todo)
 
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(SleekFlowTodo.ProjectionRepo, shared: not tags[:async])
+    pid =
+      Ecto.Adapters.SQL.Sandbox.start_owner!(SleekFlowTodo.ProjectionRepo,
+        shared: not tags[:async]
+      )
     on_exit(fn ->
+      Logger.debug("--- Test on exit ---")
       Ecto.Adapters.SQL.Sandbox.stop_owner(pid)
+
       case Application.stop(:sleekflow_todo) do
-        :ok -> :ok
+        :ok ->
+          :ok
+
         {:error, reason} ->
           IO.puts("Error stopping sleekflow_todo: #{inspect(reason)}")
           :ok
       end
     end)
+    {:ok, owner_pid: pid}
   end
 
   @doc """
