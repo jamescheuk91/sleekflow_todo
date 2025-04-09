@@ -12,11 +12,11 @@ defmodule SleekFlowTodo.Todos do
 
   ## Examples
 
-      iex> add_todo(%{description: "Buy milk"})
+      iex> add_todo(%{name: "Buy milk"})
       {:ok, "uuid-string"} # Returns {:ok, todo_id} on success
 
       iex> add_todo(%{})
-      {:error, "Failed to create command due to missing key: %KeyError{key: :description, term: %{todo_id: "..."}}"}
+      {:error, {:name, "Name is required"}}
 
   """
   def add_todo(attrs = %{}) do
