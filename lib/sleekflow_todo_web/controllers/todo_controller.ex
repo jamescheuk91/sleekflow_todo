@@ -6,11 +6,10 @@ defmodule SleekFlowTodoWeb.TodoController do
 
   action_fallback SleekFlowTodoWeb.FallbackController
 
-  def index(conn, _params) do
-    todos = Todos.list_todos()
-    conn
-    |> put_view(json: TodoJSON)
-    render(conn, :index, todos: todos)
+  def index(conn, params) do
+    filters = parse_index_filters(params)
+    todos = Todos.list_todos(filters)
+    render(conn, TodoJSON, :index, todos: todos)
   end
 
   def create(conn, %{"todo" => todo_params}) do
@@ -43,6 +42,29 @@ defmodule SleekFlowTodoWeb.TodoController do
       end
     else
       params
+    end
+  end
+
+  defp parse_index_filters(params) do
+    filters = %{}
+
+    filters =
+      case Map.get(params, "status") do
+        nil -> filters
+        status -> Map.put(filters, :status, status)
+      end
+
+    case Map.get(params, "due_date") do
+      nil -> filters
+      date_string when is_binary(date_string) ->
+        case DateTime.from_iso8601(date_string) do
+          {:ok, datetime, _offset} ->
+            Map.put(filters, :due_date, datetime)
+          {:error, _} ->
+            # Ignore invalid date strings for filtering
+            filters
+        end
+      _ -> filters # Ignore non-string due_date params
     end
   end
 end
