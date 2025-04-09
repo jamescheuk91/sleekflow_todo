@@ -13,9 +13,21 @@ defmodule SleekFlowTodo.TestSupport.Storage do
   defp reset_eventstore do
     config = SleekFlowTodo.EventStore.config()
     Logger.debug("--- Test Support: Resetting eventstore with config: #{inspect(config)} ---")
-    {:ok, conn} = Postgrex.start_link(config)
 
-    EventStore.Storage.Initializer.reset!(conn, config)
+    case Postgrex.start_link(config) do
+      {:ok, conn} ->
+        try do
+          EventStore.Storage.Initializer.reset!(conn, config)
+        rescue
+          e ->
+            Logger.error("Failed to reset eventstore: #{inspect(e)}")
+            raise e
+        end
+
+      {:error, reason} ->
+        Logger.error("Failed to connect to eventstore: #{inspect(reason)}")
+        raise "Failed to connect to eventstore: #{inspect(reason)}"
+    end
   end
 
   defp reset_readstore do
