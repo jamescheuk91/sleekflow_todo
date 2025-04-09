@@ -13,7 +13,11 @@ defmodule SleekFlowTodo.ProjectionRepo.Migrations.CreateTodoProjectionsTable do
       timestamps(type: :utc_datetime_usec) # Adds inserted_at and updated_at
     end
 
-    # Optional: Add an index if you frequently query by status
-    # create index(:todo_projections, [:status])
+    # Create index on status for efficient filtering
+    create index(:todos, [:status])
+    # Create index on due_date for efficient filtering and sorting
+    create index(:todos, [:due_date])
+    # Create index on added_at for efficient filtering and sorting
+    create index(:todos, [:added_at])
   end
 end
