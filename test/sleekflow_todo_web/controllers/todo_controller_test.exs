@@ -185,4 +185,31 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
       # assert json_response(conn, 201)["data"]["status"] == "not_started" # Enum atoms are often returned as strings in JSON
     end
   end
+
+  describe "show todo" do
+    setup do
+      # Create a todo to be fetched
+      attrs = %{name: "Show Me", description: "This is the description"}
+      todo_id = create_todo_and_wait(attrs)
+      {:ok, todo_id: todo_id}
+    end
+
+    test "renders the specific todo item", %{conn: conn, todo_id: id} do
+      conn = get(conn, ~p"/api/todos/#{id}")
+      response = json_response(conn, 200)["data"]
+
+      assert response["id"] == id
+      assert response["name"] == "Show Me"
+      assert response["description"] == "This is the description"
+      assert response["status"] == "not_started" # Assuming default status
+      assert response["due_date"] == nil         # Assuming nil if not provided
+    end
+
+    test "returns 404 when todo does not exist", %{conn: conn} do
+      non_existent_id = Ecto.UUID.generate()
+      conn = get(conn, ~p"/api/todos/#{non_existent_id}")
+      assert response(conn, 404)
+      assert json_response(conn, 404)["errors"] == %{"detail" => "Not Found"}
+    end
+  end
 end

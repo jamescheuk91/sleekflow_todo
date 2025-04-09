@@ -30,6 +30,21 @@ defmodule SleekFlowTodoWeb.TodoController do
     end
   end
 
+  def show(conn, %{"id" => id}) do
+    case Todos.get_todo(id) do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> put_view(json: SleekFlowTodoWeb.ErrorJSON)
+        |> render("404.json", %{})
+      todo ->
+        conn
+        |> put_status(:ok)
+        |> put_view(json: SleekFlowTodoWeb.TodoJSON)
+        |> render(:show, todo: todo)
+    end
+  end
+
   defp parse_due_date(params) do
     if Map.has_key?(params, :due_date) and is_binary(params.due_date) do
       case DateTime.from_iso8601(params.due_date) do
