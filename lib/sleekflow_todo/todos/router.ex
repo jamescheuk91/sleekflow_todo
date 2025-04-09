@@ -5,5 +5,5 @@ defmodule SleekFlowTodo.Todos.Router do
   alias SleekFlowTodo.Todos.Commands.AddTodo
   alias SleekFlowTodo.Todos.Commands.AddTodoHandler
 
-  dispatch AddTodo, to: AddTodoHandler, aggregate: Todo, identity: :todo_id
+  dispatch(AddTodo, to: AddTodoHandler, aggregate: Todo, identity: :todo_id)
 end

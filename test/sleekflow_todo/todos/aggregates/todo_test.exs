@@ -9,7 +9,8 @@ defmodule SleekFlowTodo.Todos.Aggregates.TodoTest do
     next_day = DateTime.add(DateTime.utc_now(), 1, :day)
     now = DateTime.utc_now()
 
-    assert %TodoAdded{} = event =
+    assert %TodoAdded{} =
+             event =
              Todo.add(%Todo{}, todo_id, "Buy milk", "Buy milk description", next_day, now)
 
     assert event.todo_id == todo_id

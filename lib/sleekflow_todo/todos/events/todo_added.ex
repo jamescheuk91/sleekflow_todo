@@ -20,15 +20,19 @@ defimpl Commanded.Serialization.JsonDecoder, for: SleekFlowTodo.Todos.Events.Tod
   Decode date strings into DateTime structs after JSON deserialization.
   Handles optional due_date.
   """
-  def decode(%SleekFlowTodo.Todos.Events.TodoAdded{due_date: due_date, added_at: added_at} = event) do
+  def decode(
+        %SleekFlowTodo.Todos.Events.TodoAdded{due_date: due_date, added_at: added_at} = event
+      ) do
     parsed_added_at =
       if is_binary(added_at) do
         case DateTime.from_iso8601(added_at) do
           {:ok, dt, _} -> dt
-          _ -> added_at # Keep original if parsing fails
+          # Keep original if parsing fails
+          _ -> added_at
         end
       else
-        added_at # Keep original if not a string
+        # Keep original if not a string
+        added_at
       end
 
     parsed_due_date =
@@ -36,12 +40,17 @@ defimpl Commanded.Serialization.JsonDecoder, for: SleekFlowTodo.Todos.Events.Tod
         is_binary(due_date) ->
           case DateTime.from_iso8601(due_date) do
             {:ok, dt, _} -> dt
-            _ -> due_date # Keep original string if parsing fails
+            # Keep original string if parsing fails
+            _ -> due_date
           end
+
         is_nil(due_date) ->
-          nil # Keep nil if it was nil
+          # Keep nil if it was nil
+          nil
+
         true ->
-          due_date # Keep original if it's neither string nor nil
+          # Keep original if it's neither string nor nil
+          due_date
       end
 
     # Return event with potentially updated fields

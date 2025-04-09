@@ -1,12 +1,13 @@
 defmodule SleekFlowTodoWeb.FallbackController do
   use SleekFlowTodoWeb, :controller
 
-
   # Handle generic :not_found errors
   def call(conn, {:error, :not_found}) do
     conn
-    |> put_status(:not_found) # 404
-    |> put_view(json: SleekFlowTodoWeb.ErrorJSON) # Use a generic ErrorJSON view
+    # 404
+    |> put_status(:not_found)
+    # Use a generic ErrorJSON view
+    |> put_view(json: SleekFlowTodoWeb.ErrorJSON)
     |> render(:"404")
   end
 

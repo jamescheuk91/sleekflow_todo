@@ -18,7 +18,8 @@ defmodule SleekFlowTodoWeb.ErrorJSON do
   # "Not Found".
 
   # Handle command validation errors passed as {field, message} tuples
-  def render("error.json", %{reason: {field, message}}) when is_atom(field) and is_binary(message) do
+  def render("error.json", %{reason: {field, message}})
+      when is_atom(field) and is_binary(message) do
     Logger.error("Rendering validation error: #{field} - #{message}")
     %{errors: %{Atom.to_string(field) => [message]}}
   end

@@ -18,7 +18,6 @@ defmodule SleekFlowTodoWeb.CoreComponents do
   use Gettext, backend: SleekFlowTodoWeb.Gettext
   alias Phoenix.LiveView.JS
 
-
   @doc """
   Renders a modal.
 
@@ -625,9 +624,7 @@ defmodule SleekFlowTodoWeb.CoreComponents do
     |> JS.show(
       to: "#mobile-sidebar",
       transition:
-        {"transition-all transform ease-out duration-300",
-         "-translate-x-full",
-         "translate-x-0"}
+        {"transition-all transform ease-out duration-300", "-translate-x-full", "translate-x-0"}
     )
     |> JS.show(
       to: "#mobile-sidebar-bg",

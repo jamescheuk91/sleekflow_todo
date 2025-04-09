@@ -19,14 +19,17 @@ defmodule SleekFlowTodo.TodosTest do
       assert {:ok, todo_id} = Todos.add_todo(attrs)
 
       # Increase timeout significantly
-      assert_receive_event(SleekFlowTodo.CommandedApplication, TodoAdded,
-      fn event -> event.todo_id == todo_id end,
-      fn event ->
-        assert event.name == "buy milk 1"
-        assert event.description == "Buy milk description 1"
-        assert event.due_date == next_day
-        assert event.added_at
-      end)
+      assert_receive_event(
+        SleekFlowTodo.CommandedApplication,
+        TodoAdded,
+        fn event -> event.todo_id == todo_id end,
+        fn event ->
+          assert event.name == "buy milk 1"
+          assert event.description == "Buy milk description 1"
+          assert event.due_date == next_day
+          assert event.added_at
+        end
+      )
     end
 
     test "returns an error when the command is invalid (name is too short)" do
@@ -86,11 +89,12 @@ defmodule SleekFlowTodo.TodosTest do
       }
 
       assert {:error, error_details} = Todos.add_todo(attrs)
+
       assert error_details == [
-        {:name, "Name must be at least 2 characters"},
-        {:description, "Description must be at least 2 characters"},
-        {:due_date, "Invalid due date format"}
-      ]
+               {:name, "Name must be at least 2 characters"},
+               {:description, "Description must be at least 2 characters"},
+               {:due_date, "Invalid due date format"}
+             ]
     end
   end
 end

@@ -24,7 +24,6 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandlerTest do
     assert {:ok, %TodoAdded{}} = AddTodoHandler.handle(aggregate, command)
   end
 
-
   test "handle/2 AddTodo command with minimal valid attributes" do
     todo_id = Commanded.UUID.uuid4()
     added_at_dt = DateTime.utc_now()
@@ -103,11 +102,13 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandlerTest do
       added_at: added_at_dt
     }
 
-    assert {:error, {:name, "Name must be at least 2 characters"}} = AddTodoHandler.handle(aggregate, command)
+    assert {:error, {:name, "Name must be at least 2 characters"}} =
+             AddTodoHandler.handle(aggregate, command)
   end
 
   test "handle/2 AddTodo command fails due to invalid description" do
     added_at_dt = DateTime.utc_now()
+
     command = %AddTodo{
       todo_id: Commanded.UUID.uuid4(),
       name: "buy some milk",
@@ -116,7 +117,9 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandlerTest do
     }
 
     aggregate = %Todo{}
-    assert {:error, {:description, "Description must be at least 2 characters"}} = AddTodoHandler.handle(aggregate, command)
+
+    assert {:error, {:description, "Description must be at least 2 characters"}} =
+             AddTodoHandler.handle(aggregate, command)
   end
 
   test "handle/2 AddTodo command fails due to invalid due_date" do
@@ -133,11 +136,13 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandlerTest do
       added_at: added_at_dt
     }
 
-    assert {:error, {:due_date, "Due date must be in the future"}} = AddTodoHandler.handle(aggregate, command)
+    assert {:error, {:due_date, "Due date must be in the future"}} =
+             AddTodoHandler.handle(aggregate, command)
   end
 
   test "handle/2 AddTodo command fails due to invalid name and description" do
     added_at_dt = DateTime.utc_now()
+
     command = %AddTodo{
       todo_id: Commanded.UUID.uuid4(),
       name: "a",
@@ -146,7 +151,12 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandlerTest do
     }
 
     aggregate = %Todo{}
-    assert {:error, [{:name, "Name must be at least 2 characters"}, {:description, "Description must be at least 2 characters"}]} = AddTodoHandler.handle(aggregate, command)
+
+    assert {:error,
+            [
+              {:name, "Name must be at least 2 characters"},
+              {:description, "Description must be at least 2 characters"}
+            ]} = AddTodoHandler.handle(aggregate, command)
   end
 
   test "handle/2 AddTodo command fails due to invalid name, description and due_date" do
@@ -163,8 +173,11 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandlerTest do
       added_at: added_at_dt
     }
 
-    assert {:error, [{:name, "Name must be at least 2 characters"},
-                     {:description, "Description must be at least 2 characters"},
-                     {:due_date, "Due date must be in the future"}]} = AddTodoHandler.handle(aggregate, command)
+    assert {:error,
+            [
+              {:name, "Name must be at least 2 characters"},
+              {:description, "Description must be at least 2 characters"},
+              {:due_date, "Due date must be in the future"}
+            ]} = AddTodoHandler.handle(aggregate, command)
   end
 end

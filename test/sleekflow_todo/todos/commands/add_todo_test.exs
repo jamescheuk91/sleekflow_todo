@@ -4,8 +4,6 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoTest do
   alias SleekFlowTodo.Todos.Commands.AddTodo
 
   describe "AddTodo command" do
-
-
     test "can be created with required fields" do
       id = Commanded.UUID.uuid4()
       added_at = DateTime.utc_now()

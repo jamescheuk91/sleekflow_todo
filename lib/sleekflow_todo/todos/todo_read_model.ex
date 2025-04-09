@@ -10,7 +10,8 @@ defmodule SleekFlowTodo.Todos.TodoReadModel do
 
     field :name, :string
     field :description, :string
-    field :status, :string # Using string representation for flexibility in read model consumers
+    # Using string representation for flexibility in read model consumers
+    field :status, :string
     field :due_date, :utc_datetime_usec
     field :added_at, :utc_datetime_usec
 

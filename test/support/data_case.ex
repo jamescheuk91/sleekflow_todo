@@ -16,6 +16,7 @@ defmodule SleekFlowTodo.DataCase do
 
   use ExUnit.CaseTemplate
   require Logger
+
   using do
     quote do
       alias SleekFlowTodo.ProjectionRepo
@@ -54,6 +55,7 @@ defmodule SleekFlowTodo.DataCase do
       Ecto.Adapters.SQL.Sandbox.start_owner!(SleekFlowTodo.ProjectionRepo,
         shared: not tags[:async]
       )
+
     on_exit(fn ->
       Logger.debug("--- Test on exit ---")
 
@@ -72,6 +74,7 @@ defmodule SleekFlowTodo.DataCase do
           :ok
       end
     end)
+
     {:ok, owner_pid: pid}
   end
 

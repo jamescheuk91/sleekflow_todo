@@ -74,7 +74,6 @@ if config_env() == :prod do
 
   config :sleekflow_todo, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
-
   host = System.get_env("PHX_HOST") || "example.com"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
