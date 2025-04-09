@@ -9,7 +9,7 @@ defmodule SleekFlowTodo.Todos.Events.TodoAdded do
           todo_id: String.t(),
           name: String.t(),
           description: String.t(),
-          status: String.t(),
+          status: :not_started | :in_progress | :completed,
           due_date: DateTime.t(),
           added_at: DateTime.t()
         }
