@@ -1,6 +1,6 @@
 defmodule SleekFlowTodoWeb.TodoController do
   use SleekFlowTodoWeb, :controller
-
+  require Logger
   alias SleekFlowTodo.Todos
 
   action_fallback SleekFlowTodoWeb.FallbackController
@@ -30,7 +30,7 @@ defmodule SleekFlowTodoWeb.TodoController do
           Map.put(params, :due_date, datetime)
         {:error, reason} ->
           # Keep the original value, the validation in the command will handle the error
-          IO.puts("Failed to parse due_date: #{inspect(reason)}")
+          Logger.error("Failed to parse due_date: #{inspect(reason)}")
           params
       end
     else
