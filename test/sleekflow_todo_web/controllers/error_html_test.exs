@@ -1,5 +1,5 @@
 defmodule SleekFlowTodoWeb.ErrorHTMLTest do
-  use SleekFlowTodoWeb.ConnCase, async: true
+  use SleekFlowTodoWeb.ConnCase
 
   # Bring render_to_string/4 for testing custom views
   import Phoenix.Template
