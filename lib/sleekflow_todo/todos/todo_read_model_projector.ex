@@ -8,6 +8,7 @@ defmodule SleekFlowTodo.Todos.TodoReadModelProjector do
   require Logger
 
   alias SleekFlowTodo.Todos.Events.TodoAdded
+  alias SleekFlowTodo.Todos.Events.TodoEdited
   alias SleekFlowTodo.Todos.TodoReadModel
 
   project(%TodoAdded{} = event, _metadata, fn multi ->
@@ -22,6 +23,13 @@ defmodule SleekFlowTodo.Todos.TodoReadModelProjector do
     }
 
     # Pass the struct directly to Ecto.Multi.insert
-    Ecto.Multi.insert(multi, :todo_read_model, struct)
+    Ecto.Multi.insert(multi, :insert_todo_read_model, struct)
   end)
+
+  project(%TodoEdited{} = event, _metadata, fn multi ->
+    todo = SleekFlowTodo.ProjectionRepo.get!(TodoReadModel, event.todo_id)
+    changeset = TodoReadModel.changeset(todo, event)
+    Ecto.Multi.update(multi, :update_todo_read_model, changeset)
+  end)
+
 end
