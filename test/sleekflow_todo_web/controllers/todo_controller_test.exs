@@ -111,36 +111,6 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
       assert length(response) == 2
     end
 
-    # Original test kept for regression, updated for new statuses/names
-    # test "renders todo items correctly (original)", %{conn: conn, todo_ids: ids} do
-    #   # Make the request to get all todos
-    #   conn = get(conn, ~p"/api/todos")
-
-    #   # Assert the response
-    #   response = json_response(conn, 200)["data"]
-    #   assert is_list(response)
-    #   assert length(response) == 3
-
-    #   # Extract todos with their names and IDs
-    #   todo_ns1 = Enum.find(response, fn todo -> todo["id"] == ids.not_started_1 end)
-    #   todo_ns2 = Enum.find(response, fn todo -> todo["id"] == ids.not_started_2 end)
-    #   todo_c1 = Enum.find(response, fn todo -> todo["id"] == ids.completed end)
-
-    #   # Verify all todos exist
-    #   assert todo_ns1 != nil
-    #   assert todo_ns2 != nil
-    #   assert todo_c1 != nil
-
-    #   # Verify names match
-    #   assert todo_ns1["name"] == "Not Started 1"
-    #   assert todo_ns2["name"] == "Not Started 2"
-    #   assert todo_c1["name"] == "Completed 1"
-
-    #   # Verify statuses (assuming read model stores strings)
-    #   assert todo_ns1["status"] == "not_started"
-    #   assert todo_ns2["status"] == "not_started"
-    #   assert todo_c1["status"] == "completed"
-    # end
   end
 
   describe "create todo" do

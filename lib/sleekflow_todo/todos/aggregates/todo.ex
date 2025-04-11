@@ -6,6 +6,7 @@ defmodule SleekFlowTodo.Todos.Aggregates.Todo do
 
   alias SleekFlowTodo.Todos.Aggregates.Todo
   alias SleekFlowTodo.Todos.Events.TodoAdded
+  alias SleekFlowTodo.Todos.Events.TodoEdited
 
   defstruct [
     :todo_id,
@@ -50,6 +51,32 @@ defmodule SleekFlowTodo.Todos.Aggregates.Todo do
     event
   end
 
+  def edit(
+        %Todo{todo_id: todo_id} = aggregate_state,
+        todo_id,
+        name,
+        description,
+        due_date,
+        status
+      ) do
+    Logger.debug("[Todo.edit] Received aggregate state: #{inspect(aggregate_state)}")
+    Logger.debug("
+    [Todo.edit] Pmaras:
+    todo_id: #{todo_id}, name: #{name}, description: #{description}, due_date: #{inspect(due_date)}, status: #{status}
+    ")
+
+    event = %TodoEdited{
+      todo_id: todo_id,
+      name: name,
+      description: description,
+      due_date: due_date,
+      status: status
+    }
+    Logger.debug("[Todo.edit] Returning event: #{inspect(event)}")
+
+    event
+  end
+
   # Event application
   def apply(%__MODULE__{} = state, %TodoAdded{} = event) do
     Logger.debug("[Todo.apply] Applying event: #{inspect(event)}")
@@ -62,6 +89,20 @@ defmodule SleekFlowTodo.Todos.Aggregates.Todo do
         due_date: event.due_date,
         added_at: event.added_at,
         status: :not_started
+    }
+  end
+
+  # Add apply function for TodoEdited
+  def apply(%__MODULE__{} = state, %TodoEdited{} = event) do
+    Logger.debug("[Todo.apply(TodoEdited)] Applying event: #{inspect(event)}")
+
+    %__MODULE__{
+      state
+      | name: event.name,
+        description: event.description,
+        due_date: event.due_date,
+        status: event.status,
+        updated_at: DateTime.utc_now()
     }
   end
 end

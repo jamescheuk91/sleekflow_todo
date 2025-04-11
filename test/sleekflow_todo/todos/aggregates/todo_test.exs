@@ -3,6 +3,8 @@ defmodule SleekFlowTodo.Todos.Aggregates.TodoTest do
 
   alias SleekFlowTodo.Todos.Aggregates.Todo
   alias SleekFlowTodo.Todos.Events.TodoAdded
+  alias SleekFlowTodo.Todos.Commands.EditTodo
+  alias SleekFlowTodo.Todos.Events.TodoEdited
 
   test "add_todo/6 returns TodoAdded event" do
     todo_id = Commanded.UUID.uuid4()
@@ -44,5 +46,41 @@ defmodule SleekFlowTodo.Todos.Aggregates.TodoTest do
              added_at: ^now,
              status: :not_started
            } = Todo.apply(state, event)
+  end
+
+  test "apply/2 TodoEdited event to Todo aggregate" do
+    todo_id = Commanded.UUID.uuid4()
+    now = DateTime.utc_now()
+    later = DateTime.add(now, 1, :hour)
+    tomorrow = DateTime.add(now, 1, :day)
+
+    initial_state = %Todo{
+      todo_id: todo_id,
+      name: "Initial Name",
+      description: "Initial Description",
+      due_date: tomorrow,
+      status: :not_started,
+      added_at: now,
+      updated_at: nil
+    }
+
+    event = %TodoEdited{
+      todo_id: todo_id,
+      name: "Updated Name",
+      description: "Updated Description",
+      due_date: later,
+      status: :in_progress
+    }
+
+    updated_state = Todo.apply(initial_state, event)
+
+    assert updated_state.todo_id == todo_id
+    assert updated_state.name == "Updated Name"
+    assert updated_state.description == "Updated Description"
+    assert updated_state.due_date == later
+    assert updated_state.status == :in_progress
+    assert updated_state.added_at == now
+    assert updated_state.updated_at != nil
+    assert DateTime.diff(DateTime.utc_now(), updated_state.updated_at) < 2
   end
 end

@@ -18,7 +18,6 @@ defmodule SleekFlowTodo.Todos.GetTodoItemServiceTest do
           added_at: now,
         }
         |> Todos.add_todo()
-        |> IO.inspect()
 
       assert %TodoReadModel{} = found_todo = GetTodoItemService.get_todo(todo_id)
       assert found_todo.id == todo_id
