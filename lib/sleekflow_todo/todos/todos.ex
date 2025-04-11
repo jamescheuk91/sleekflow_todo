@@ -6,9 +6,14 @@ defmodule SleekFlowTodo.Todos do
 
   alias SleekFlowTodo.CommandedApplication
   alias SleekFlowTodo.ProjectionRepo
+  alias SleekFlowTodo.Todos.GetTodoListService
   alias SleekFlowTodo.Todos.Commands.AddTodo
   alias SleekFlowTodo.Todos.TodoReadModel
-  import Ecto.Query
+
+  @doc """
+    Returns a list of all todo items from the read model, optionally filtered and sorted.
+  """
+  defdelegate list_todos(opts \\ []), to: GetTodoListService
 
   @doc """
   Adds a new todo item.

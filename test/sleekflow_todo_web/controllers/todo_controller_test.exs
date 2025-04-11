@@ -1,7 +1,5 @@
 defmodule SleekFlowTodoWeb.TodoControllerTest do
   use SleekFlowTodoWeb.ConnCase, async: false
-  alias SleekFlowTodo.Todos.TodoReadModel
-  alias SleekFlowTodo.ProjectionRepo
 
   # Helper function to create a todo and wait for projection
   defp create_todo_and_wait(attrs) do
@@ -67,7 +65,7 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
       assert ids.not_started_2 in response_ids
     end
 
-    test "filters todo items by status=completed", %{conn: conn, todo_ids: ids} do
+    test "filters todo items by status=completed", %{conn: conn, todo_ids: _ids} do
       conn = get(conn, ~p"/api/todos?status=completed")
       response = json_response(conn, 200)["data"]
       assert length(response) == 0
@@ -100,7 +98,7 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
     end
 
      test "returns empty list for non-matching due_date", %{conn: conn} do
-      date_str = DateTime.to_iso8601(~U[2099-12-31 23:59:59Z])
+      date_str = DateTime.to_iso8601(~U[2024-12-31 23:59:59Z])
       conn = get(conn, ~p"/api/todos?due_date=#{date_str}")
       response = json_response(conn, 200)["data"]
       assert response == []
