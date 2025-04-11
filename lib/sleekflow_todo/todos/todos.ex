@@ -5,15 +5,18 @@ defmodule SleekFlowTodo.Todos do
   require Logger
 
   alias SleekFlowTodo.CommandedApplication
-  alias SleekFlowTodo.ProjectionRepo
   alias SleekFlowTodo.Todos.GetTodoListService
   alias SleekFlowTodo.Todos.Commands.AddTodo
-  alias SleekFlowTodo.Todos.TodoReadModel
-
+  alias SleekFlowTodo.Todos.GetTodoItemService
   @doc """
     Returns a list of all todo items from the read model, optionally filtered and sorted.
   """
   defdelegate list_todos(opts \\ []), to: GetTodoListService
+
+  @doc """
+  Retrieves a single todo item by its ID from the read model.
+  """
+  defdelegate get_todo(id), to: GetTodoItemService
 
   @doc """
   Adds a new todo item.
@@ -89,20 +92,5 @@ defmodule SleekFlowTodo.Todos do
   #   {:error, "Failed to create command: #{inspect(other_reason)}"}
   # end
 
-  @doc """
-  Retrieves a single todo item by its ID from the read model.
 
-  Returns the `TodoReadModel` struct if found, otherwise `nil`.
-
-  ## Examples
-
-      iex> get_todo("valid-uuid")
-      %TodoReadModel{}
-
-      iex> get_todo("invalid-uuid")
-      nil
-  """
-  def get_todo(id) do
-    ProjectionRepo.get(TodoReadModel, id)
-  end
 end
