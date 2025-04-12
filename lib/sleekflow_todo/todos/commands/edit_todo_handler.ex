@@ -65,7 +65,7 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandler do
   end
 
   # Individual validators (now take the whole command)
-  defp validate_name(%EditTodo{name: nil}), do: {:error, {:name, "Name is required"}}
+  defp validate_name(%EditTodo{name: nil}), do: :ok
 
   defp validate_name(%EditTodo{name: name}) do
     if is_binary(name) and String.length(name) >= 2 do

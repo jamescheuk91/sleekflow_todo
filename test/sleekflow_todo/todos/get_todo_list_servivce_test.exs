@@ -1,11 +1,9 @@
 defmodule SleekFlowTodo.Todos.GetTodoListServiceTest do
   use SleekFlowTodo.DataCase
 
-  alias SleekFlowTodo.Todos
   alias SleekFlowTodo.Todos.GetTodoListService
   alias SleekFlowTodo.Todos.TodoReadModel
   alias SleekFlowTodo.ProjectionRepo
-  import Ecto.Query
 
   # Setup test data
   setup do
@@ -19,7 +17,7 @@ defmodule SleekFlowTodo.Todos.GetTodoListServiceTest do
         id: Commanded.UUID.uuid4(),
         name: "Task A",
         description: "Description A",
-        status: "not_started",
+        status: :not_started,
         due_date: due_date_1,
         added_at: now,
         updated_at: now
@@ -31,7 +29,7 @@ defmodule SleekFlowTodo.Todos.GetTodoListServiceTest do
         id: Commanded.UUID.uuid4(),
         name: "Task B",
         description: "Description B",
-        status: "completed",
+        status: :completed,
         due_date: due_date_2,
         added_at: now
       }
@@ -42,7 +40,7 @@ defmodule SleekFlowTodo.Todos.GetTodoListServiceTest do
         id: Commanded.UUID.uuid4(),
         name: "Task C",
         description: "Description C",
-        status: "not_started",
+        status: :not_started,
         due_date: nil,
         added_at: now
       }
@@ -61,14 +59,13 @@ defmodule SleekFlowTodo.Todos.GetTodoListServiceTest do
     end
 
     test "filters todos by status" do
-
-      todos = GetTodoListService.list_todos(filters: %{status: "not_started"})
+      todos = GetTodoListService.list_todos(filters: %{status: :not_started})
       assert length(todos) == 2
-      assert Enum.all?(todos, &(&1.status == "not_started"))
+      assert Enum.all?(todos, &(&1.status == :not_started))
       # Default sort should still apply
       assert Enum.map(todos, & &1.name) == ["Task A", "Task C"]
 
-      todos_empty = GetTodoListService.list_todos(filters: %{status: "in_progress"})
+      todos_empty = GetTodoListService.list_todos(filters: %{status: :in_progress})
       assert length(todos_empty) == 0
     end
 
@@ -101,11 +98,11 @@ defmodule SleekFlowTodo.Todos.GetTodoListServiceTest do
 
     test "ignores invalid filter keys" do
       todos =
-        GetTodoListService.list_todos(filters: %{invalid_key: "value", status: "not_started"})
+        GetTodoListService.list_todos(filters: %{invalid_key: "value", status: :not_started})
 
       # Should still filter by status correctly
       assert length(todos) == 2
-      assert Enum.all?(todos, &(&1.status == "not_started"))
+      assert Enum.all?(todos, &(&1.status == :not_started))
       assert Enum.map(todos, & &1.name) == ["Task A", "Task C"]
     end
 
@@ -117,7 +114,7 @@ defmodule SleekFlowTodo.Todos.GetTodoListServiceTest do
       assert Enum.map(todos, & &1.name) == ["Task A", "Task B", "Task C"]
 
       # Invalid status type
-      todos = GetTodoListService.list_todos(filters: %{status: :not_a_string})
+      todos = GetTodoListService.list_todos(filters: %{status: :invalid_status})
       # Filter ignored, returns all
       assert length(todos) == 3
       assert Enum.map(todos, & &1.name) == ["Task A", "Task B", "Task C"]
@@ -133,7 +130,7 @@ defmodule SleekFlowTodo.Todos.GetTodoListServiceTest do
       todos = GetTodoListService.list_todos(sort: %{field: :status, direction: :asc})
       assert length(todos) == 3
       # completed comes before not_started alphabetically
-      assert Enum.map(todos, & &1.status) == ["completed", "not_started", "not_started"]
+      assert Enum.map(todos, & &1.status) == [:completed, :not_started, :not_started]
       # Check names within status groups (assuming default name asc secondary sort)
       assert Enum.map(todos, & &1.name) == ["Task B", "Task A", "Task C"]
     end
@@ -141,7 +138,7 @@ defmodule SleekFlowTodo.Todos.GetTodoListServiceTest do
     test "sorts todos by status descending" do
       todos = GetTodoListService.list_todos(sort: %{field: :status, direction: :desc})
       assert length(todos) == 3
-      assert Enum.map(todos, & &1.status) == ["not_started", "not_started", "completed"]
+      assert Enum.map(todos, & &1.status) == [:not_started, :not_started, :completed]
       # Check names within status groups (assuming default name asc secondary sort)
       assert Enum.map(todos, & &1.name) == ["Task A", "Task C", "Task B"]
     end
@@ -183,7 +180,7 @@ defmodule SleekFlowTodo.Todos.GetTodoListServiceTest do
         )
 
       assert length(todos) == 2
-      assert Enum.all?(todos, &(&1.status == "not_started"))
+      assert Enum.all?(todos, &(&1.status == :not_started))
       # Due dates 20th, 15th
       assert Enum.map(todos, & &1.name) == ["Task C", "Task A"]
     end

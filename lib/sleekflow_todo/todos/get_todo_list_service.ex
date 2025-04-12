@@ -55,7 +55,7 @@ defmodule SleekFlowTodo.Todos.GetTodoListService do
   """
   def filter_query(filters) do
     Enum.reduce(filters, dynamic(true), fn
-      {:status, status}, dynamic when is_binary(status) ->
+      {:status, status}, dynamic when is_atom(status) and status in [:not_started, :in_progress, :completed] ->
         dynamic([q], q.status == ^status and ^dynamic)
 
       {:due_date, due_date}, dynamic when is_struct(due_date, DateTime) ->

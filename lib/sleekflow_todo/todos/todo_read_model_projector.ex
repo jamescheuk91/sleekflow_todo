@@ -17,7 +17,7 @@ defmodule SleekFlowTodo.Todos.TodoReadModelProjector do
       id: event.todo_id,
       name: event.name,
       description: event.description,
-      status: event.status,
+      status: String.to_existing_atom(event.status),
       due_date: event.due_date,
       added_at: event.added_at
     }
@@ -28,7 +28,18 @@ defmodule SleekFlowTodo.Todos.TodoReadModelProjector do
 
   project(%TodoEdited{} = event, _metadata, fn multi ->
     todo = SleekFlowTodo.ProjectionRepo.get!(TodoReadModel, event.todo_id)
-    changeset = TodoReadModel.changeset(todo, event)
+    attrs =
+      Map.from_struct(event)
+      |> Map.update(:status, nil, fn
+        nil -> nil # Keep it nil if it's nil initially
+        status_str when is_binary(status_str) -> String.to_existing_atom(status_str) # Convert if it's a string
+        atom when is_atom(atom) -> atom # Keep it if it's already an atom
+      end)
+      # Filter out keys where the value is nil *after* potential status conversion
+      |> Enum.reject(fn {_, v} -> is_nil(v) end)
+      |> Map.new()
+
+    changeset = TodoReadModel.changeset(todo, attrs)
     Ecto.Multi.update(multi, :update_todo_read_model, changeset)
   end)
 

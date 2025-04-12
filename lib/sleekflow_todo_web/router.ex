@@ -24,7 +24,7 @@ defmodule SleekFlowTodoWeb.Router do
   scope "/api", SleekFlowTodoWeb do
     pipe_through :api
 
-    resources "/todos", TodoController, only: [:index, :create, :show]
+    resources "/todos", TodoController, only: [:index, :create, :show, :update]
   end
 
   # Enable LiveDashboard in development

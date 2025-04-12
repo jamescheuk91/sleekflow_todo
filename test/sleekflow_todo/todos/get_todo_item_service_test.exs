@@ -24,7 +24,7 @@ defmodule SleekFlowTodo.Todos.GetTodoItemServiceTest do
       assert found_todo.name == "Task A"
       assert found_todo.description == "Description A"
       assert found_todo.due_date == due_date_1
-      assert found_todo.status == "not_started"
+      assert found_todo.status == :not_started
     end
 
     test "returns nil if the todo item does not exist" do

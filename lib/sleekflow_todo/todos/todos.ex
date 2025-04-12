@@ -7,6 +7,7 @@ defmodule SleekFlowTodo.Todos do
   alias SleekFlowTodo.CommandedApplication
   alias SleekFlowTodo.Todos.GetTodoListService
   alias SleekFlowTodo.Todos.Commands.AddTodo
+  alias SleekFlowTodo.Todos.Commands.EditTodo
   alias SleekFlowTodo.Todos.GetTodoItemService
 
   @doc """
@@ -18,7 +19,7 @@ defmodule SleekFlowTodo.Todos do
   Retrieves a single todo item by its ID from the read model.
   """
   defdelegate get_todo(id), to: GetTodoItemService
-
+  defdelegate get_todo!(id), to: GetTodoItemService
   @doc """
   Adds a new todo item.
 
@@ -81,10 +82,10 @@ defmodule SleekFlowTodo.Todos do
     end
   end
 
-  def edit_todo(attrs = %{}) do
+  def edit_todo(todo_id, attrs = %{}) do
     Logger.debug("[Todos.edit_todo] Received attributes: #{inspect(attrs)}")
 
-    command_attrs = Map.put(attrs, :todo_id, attrs.id)
+    command_attrs = Map.put(attrs, :todo_id, todo_id)
     Logger.debug("[Todos.edit_todo] Command attributes: #{inspect(command_attrs)}")
 
     with command = build_edit_todo_command(command_attrs),

@@ -24,11 +24,13 @@ defmodule SleekFlowTodoWeb.TodoController do
     # Convert due_date from string to DateTime if present
     params = parse_due_date(params)
 
-    with {:ok, todo_id} <- Todos.add_todo(params) do
+    with {:ok, todo_id} <- Todos.add_todo(params),
+         todo <- Todos.get_todo!(todo_id) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/todos/#{todo_id}")
-      |> json(%{data: %{id: todo_id}})
+      |> put_view(json: TodoJSON)
+      |> render(:show, todo: todo)
     else
       {:error, reason} ->
         conn
@@ -54,6 +56,38 @@ defmodule SleekFlowTodoWeb.TodoController do
     end
   end
 
+  def update(conn, %{"id" => id, "todo" => todo_params}) do
+    case Todos.get_todo(id) do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> put_view(json: ErrorJSON)
+        |> render("404.json", %{})
+
+      _existing_todo ->
+        # Todo exists, proceed with the update logic
+        params = SleekFlowTodo.Utils.key_to_atom(todo_params)
+        # Convert due_date from string to DateTime if present
+        params = parse_due_date(params)
+
+        with {:ok, todo_id} <- Todos.edit_todo(id, params),
+             # Fetch the updated todo state after the command is processed
+             updated_todo <- Todos.get_todo!(todo_id) do
+          conn
+          |> put_status(:ok)
+          |> put_view(json: TodoJSON)
+          |> render(:show, todo: updated_todo)
+        else
+          # Handle errors from Todos.edit_todo (e.g., validation)
+          {:error, reason} ->
+            conn
+            |> put_status(:unprocessable_entity)
+            |> put_view(json: ErrorJSON)
+            |> render(:error, reason: reason)
+        end
+    end
+  end
+
   defp parse_due_date(params) do
     if Map.has_key?(params, :due_date) and is_binary(params.due_date) do
       case DateTime.from_iso8601(params.due_date) do
@@ -76,7 +110,14 @@ defmodule SleekFlowTodoWeb.TodoController do
     filters =
       case Map.get(params, "status") do
         nil -> filters
-        status -> Map.put(filters, :status, status)
+        status_string when is_binary(status_string) ->
+          case String.to_existing_atom(status_string) do
+            atom when is_atom(atom) -> Map.put(filters, :status, atom)
+            # Ignore invalid status strings for filtering
+            _ -> filters
+          end
+        # Ignore non-string status params
+        _ -> filters
       end
 
     case Map.get(params, "due_date") do

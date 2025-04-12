@@ -22,4 +22,9 @@ defmodule SleekFlowTodo.Todos.GetTodoItemService do
   def get_todo(id) do
     ProjectionRepo.get(TodoReadModel, id)
   end
+
+
+  def get_todo!(id) do
+    ProjectionRepo.get!(TodoReadModel, id)
+  end
 end

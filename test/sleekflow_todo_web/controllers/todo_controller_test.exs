@@ -114,14 +114,36 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
   end
 
   describe "create todo" do
-    test "renders todo id", %{conn: conn} do
+    test "renders todo with minimal attributes", %{conn: conn} do
       attrs = %{name: "Test Todo"}
 
       conn = post(conn, ~p"/api/todos", todo: attrs)
-      assert json_response(conn, 201)["data"]["id"]
-      # assert json_response(conn, 201)["data"]["name"] == "Test Todo"
-      # assert json_response(conn, 201)["data"]["status"] == "not_started" # Enum atoms are often returned as strings in JSON
+      response = json_response(conn, 201)["data"]
+
+      assert response["id"]
+      assert response["name"] == "Test Todo"
+      assert response["description"] == nil
+      assert response["status"] == "not_started"
+      assert response["due_date"] == nil
+      assert response["added_at"]
+      assert response["updated_at"]
     end
+
+    test "renders todo with all attributes", %{conn: conn} do
+      due_date_string = DateTime.utc_now() |> DateTime.add(1, :day) |> DateTime.to_iso8601()
+      attrs = %{name: "Test Todo", description: "Test Description", due_date: due_date_string}
+      conn = post(conn, ~p"/api/todos", todo: attrs)
+      response = json_response(conn, 201)["data"]
+
+      assert response["id"]
+      assert response["name"] == "Test Todo"
+      assert response["description"] == "Test Description"
+      assert response["status"] == "not_started"
+      assert response["due_date"] == due_date_string
+      assert response["added_at"]
+      assert response["updated_at"]
+    end
+
 
     test "renders error when name is missing", %{conn: conn} do
       attrs = %{}
@@ -176,6 +198,75 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
     test "returns 404 when todo does not exist", %{conn: conn} do
       non_existent_id = Ecto.UUID.generate()
       conn = get(conn, ~p"/api/todos/#{non_existent_id}")
+      assert response(conn, 404)
+      assert json_response(conn, 404)["errors"] == %{"detail" => "Not Found"}
+    end
+  end
+
+  describe "edit todo" do
+    setup do
+      # Create a todo to be edited
+      attrs = %{name: "Edit Me", description: "This is the description"}
+      todo_id = create_todo_and_wait(attrs)
+      {:ok, todo_id: todo_id}
+    end
+
+    test "renders updated todo when data is valid", %{conn: conn, todo_id: id} do
+      due_date_string = DateTime.utc_now() |> DateTime.add(3, :day) |> DateTime.to_iso8601()
+      update_attrs = %{
+        name: "Updated Name",
+        description: "Updated Description",
+        status: :completed,
+        due_date: due_date_string
+      }
+
+      conn = put(conn, ~p"/api/todos/#{id}", todo: update_attrs)
+      response = json_response(conn, 200)["data"]
+
+      assert response["id"] == id
+      assert response["name"] == "Updated Name"
+      assert response["description"] == "Updated Description"
+      assert response["status"] == "completed"
+      assert response["due_date"] == due_date_string
+    end
+
+    test "renders updated todo with partial data", %{conn: conn, todo_id: id} do
+      update_attrs = %{name: "Just Updated Name"}
+
+      conn = put(conn, ~p"/api/todos/#{id}", todo: update_attrs)
+      response = json_response(conn, 200)["data"]
+
+      assert response["id"] == id
+      assert response["name"] == "Just Updated Name"
+      assert response["description"] == "This is the description" # Original description
+      assert response["status"] == "not_started" # Original status
+    end
+
+    test "renders error when name is too short on update", %{conn: conn, todo_id: id} do
+      update_attrs = %{name: "a"}
+      conn = put(conn, ~p"/api/todos/#{id}", todo: update_attrs)
+
+      assert json_response(conn, 422)["errors"] == %{
+               "name" => ["Name must be at least 2 characters"]
+             }
+    end
+
+    test "renders error when due_date is in the past on update", %{conn: conn, todo_id: id} do
+      yesterday_due_date_string =
+        DateTime.utc_now() |> DateTime.add(-1, :day) |> DateTime.to_iso8601()
+
+      update_attrs = %{due_date: yesterday_due_date_string}
+      conn = put(conn, ~p"/api/todos/#{id}", todo: update_attrs)
+
+      assert json_response(conn, 422)["errors"] == %{
+               "due_date" => ["Due date must be in the future"]
+             }
+    end
+
+    test "returns 404 when trying to update non-existent todo", %{conn: conn} do
+      non_existent_id = Ecto.UUID.generate()
+      update_attrs = %{name: "Doesn't Matter"}
+      conn = put(conn, ~p"/api/todos/#{non_existent_id}", todo: update_attrs)
       assert response(conn, 404)
       assert json_response(conn, 404)["errors"] == %{"detail" => "Not Found"}
     end
