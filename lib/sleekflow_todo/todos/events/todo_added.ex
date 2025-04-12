@@ -3,16 +3,17 @@ defmodule SleekFlowTodo.Todos.Events.TodoAdded do
   Event dispatched when a new todo item has been added.
   """
   @derive Jason.Encoder
-  defstruct [:todo_id, :name, :description, :status, :due_date, :added_at]
+  use TypedStruct
 
-  @type t :: %__MODULE__{
-          todo_id: String.t(),
-          name: String.t(),
-          description: String.t(),
-          status: :not_started | :in_progress | :completed,
-          due_date: DateTime.t(),
-          added_at: DateTime.t()
-        }
+  typedstruct do
+    @typedoc "An event indicating a todo item has been added."
+    field :todo_id, String.t(), enforce: true
+    field :name, String.t()
+    field :description, String.t()
+    field :status, Ecto.Enum, values: [:not_started, :in_progress, :completed]
+    field :due_date, DateTime.t()
+    field :added_at, DateTime.t(), enforce: true
+  end
 end
 
 defimpl Commanded.Serialization.JsonDecoder, for: SleekFlowTodo.Todos.Events.TodoAdded do

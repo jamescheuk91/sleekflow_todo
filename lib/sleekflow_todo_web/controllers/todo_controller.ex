@@ -88,6 +88,30 @@ defmodule SleekFlowTodoWeb.TodoController do
     end
   end
 
+  def delete(conn, %{"id" => id}) do
+    case Todos.get_todo(id) do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> put_view(json: ErrorJSON)
+        |> render("404.json", %{})
+
+      _todo ->
+        with {:ok, _} <- Todos.remove_todo(id) do
+          send_resp(conn, :no_content, "")
+        else
+          {:error, reason} ->
+            # Log unexpected delete errors
+            Logger.error("Error deleting todo #{id}: #{inspect(reason)}")
+
+            conn
+            |> put_status(:internal_server_error)
+            |> put_view(json: ErrorJSON)
+            |> render(:error, reason: reason)
+        end
+    end
+  end
+
   defp parse_due_date(params) do
     if Map.has_key?(params, :due_date) and is_binary(params.due_date) do
       case DateTime.from_iso8601(params.due_date) do

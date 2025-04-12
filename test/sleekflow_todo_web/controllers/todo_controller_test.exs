@@ -1,6 +1,8 @@
 defmodule SleekFlowTodoWeb.TodoControllerTest do
   use SleekFlowTodoWeb.ConnCase, async: false
 
+  alias SleekFlowTodo.Todos
+
   # Helper function to create a todo and wait for projection
   defp create_todo_and_wait(attrs) do
     {:ok, todo_id} = SleekFlowTodo.Todos.add_todo(attrs)
@@ -305,4 +307,30 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
       assert json_response(conn, 404)["errors"] == %{"detail" => "Not Found"}
     end
   end
+
+  describe "delete todo" do
+    setup do
+      attrs = %{name: "Delete Me", description: "This is the description"}
+      todo_id = create_todo_and_wait(attrs)
+      {:ok, todo_id: todo_id}
+    end
+
+    test "returns 204 No Content when data is valid", %{conn: conn, todo_id: todo_id} do
+      conn = delete(conn, ~p"/api/todos/#{todo_id}")
+
+      assert response(conn, 204) == ""
+
+      # Verify the todo is actually gone from the read model perspective
+      assert Todos.get_todo(todo_id) == nil
+    end
+
+    test "returns 404 Not Found when todo does not exist", %{conn: conn} do
+      non_existent_uuid = Ecto.UUID.generate()
+      conn = delete(conn, ~p"/api/todos/#{non_existent_uuid}")
+      assert response(conn, 404)
+      # Optionally check the body structure if you have a standard error format
+      # assert json_response(conn, 404)["errors"] != nil
+    end
+  end
+
 end

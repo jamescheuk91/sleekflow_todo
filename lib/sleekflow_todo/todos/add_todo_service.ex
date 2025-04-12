@@ -31,11 +31,6 @@ defmodule SleekFlowTodo.Todos.AddTodoService do
         Logger.error("[AddTodoService.add_todo] Dispatch error: #{inspect(error_details)}")
         {:error, error_details}
 
-      # Error from build_add_todo_command - although current build doesn't return errors, it might in the future
-      {:error, {:build, error_details}} ->
-        Logger.error("[AddTodoService.add_todo] Build error: #{inspect(error_details)}")
-        {:error, error_details}
-
       # Catch-all for unexpected errors
       other_error ->
         Logger.error("[AddTodoService.add_todo] Unexpected error: #{inspect(other_error)}")
@@ -43,7 +38,6 @@ defmodule SleekFlowTodo.Todos.AddTodoService do
     end
   end
 
-  # Helper returning command struct. Currently, doesn't return errors, but could be adapted.
   defp build_add_todo_command(attrs) do
     attrs =
       attrs

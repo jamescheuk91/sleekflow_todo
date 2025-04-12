@@ -8,6 +8,7 @@ defmodule SleekFlowTodo.Todos do
   alias SleekFlowTodo.Todos.AddTodoService
   alias SleekFlowTodo.Todos.GetTodoItemService
   alias SleekFlowTodo.Todos.EditTodoService
+  alias SleekFlowTodo.Todos.RemoveTodoService
 
   @doc """
     Returns a list of all todo items from the read model, optionally filtered and sorted.
@@ -39,4 +40,9 @@ defmodule SleekFlowTodo.Todos do
   Edits an existing todo item. Delegates to `SleekFlowTodo.Todos.EditTodoService`.
   """
   defdelegate edit_todo(todo_id, attrs \\ %{}), to: EditTodoService
+
+  @doc """
+  Removes an existing todo item. Delegates to `SleekFlowTodo.Todos.RemoveTodoService`.
+  """
+  defdelegate remove_todo(todo_id), to: RemoveTodoService
 end

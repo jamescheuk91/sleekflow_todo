@@ -9,6 +9,7 @@ defmodule SleekFlowTodo.Todos.TodoReadModelProjector do
 
   alias SleekFlowTodo.Todos.Events.TodoAdded
   alias SleekFlowTodo.Todos.Events.TodoEdited
+  alias SleekFlowTodo.Todos.Events.TodoRemoved
   alias SleekFlowTodo.Todos.TodoReadModel
 
   project(%TodoAdded{} = event, _metadata, fn multi ->
@@ -41,6 +42,20 @@ defmodule SleekFlowTodo.Todos.TodoReadModelProjector do
 
     changeset = TodoReadModel.changeset(todo, attrs)
     Ecto.Multi.update(multi, :update_todo_read_model, changeset)
+  end)
+
+  project(%TodoRemoved{} = event, _metadata, fn multi ->
+    case SleekFlowTodo.ProjectionRepo.get(TodoReadModel, event.todo_id) do
+      nil ->
+        Logger.error(
+          "[TodoReadModelProjector] Received TodoRemoved for non-existent read model: #{event.todo_id}"
+        )
+
+        multi # Return multi unchanged if record not found
+
+      todo ->
+        Ecto.Multi.delete(multi, :delete_todo_read_model, todo)
+    end
   end)
 
 end

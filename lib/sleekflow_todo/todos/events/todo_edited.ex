@@ -3,21 +3,16 @@ defmodule SleekFlowTodo.Todos.Events.TodoEdited do
   Event dispatched when a todo item has been edited.
   """
   @derive Jason.Encoder
-  defstruct [
-    :todo_id,
-    :name,
-    :description,
-    :due_date,
-    :status
-  ]
+  use TypedStruct
 
-  @type t :: %__MODULE__{
-          todo_id: String.t(),
-          name: String.t(),
-          description: String.t(),
-          due_date: DateTime.t(),
-          status: :not_started | :in_progress | :completed
-        }
+  typedstruct do
+    @typedoc "An event indicating a todo item has been edited."
+    field :todo_id, String.t(), enforce: true
+    field :name, String.t()
+    field :description, String.t()
+    field :due_date, DateTime.t()
+    field :status, Ecto.Enum, values: [:not_started, :in_progress, :completed]
+  end
 end
 
 defimpl Commanded.Serialization.JsonDecoder, for: SleekFlowTodo.Todos.Events.TodoEdited do
