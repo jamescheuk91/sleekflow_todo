@@ -146,7 +146,7 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
 
 
     test "renders error when name is missing", %{conn: conn} do
-      attrs = %{}
+      attrs = %{name: nil}
       conn = post(conn, ~p"/api/todos", todo: attrs)
       assert json_response(conn, 422)["errors"] == %{"name" => ["Name is required"]}
     end
