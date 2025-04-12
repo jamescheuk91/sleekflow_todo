@@ -263,6 +263,40 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
              }
     end
 
+    test "renders updated todo with only description", %{conn: conn, todo_id: id} do
+      update_attrs = %{description: "Updated Description"}
+      conn = put(conn, ~p"/api/todos/#{id}", todo: update_attrs)
+      response = json_response(conn, 200)["data"]
+      assert response["id"] == id
+      assert response["name"] == "Edit Me"
+      assert response["description"] == "Updated Description"
+      assert response["status"] == "not_started"
+      assert response["due_date"] == nil
+    end
+
+    test "renders updated todo with only status", %{conn: conn, todo_id: id} do
+      update_attrs = %{status: :completed}
+      conn = put(conn, ~p"/api/todos/#{id}", todo: update_attrs)
+      response = json_response(conn, 200)["data"]
+      assert response["id"] == id
+      assert response["name"] == "Edit Me"
+      assert response["description"] == "This is the description"
+      assert response["status"] == "completed"
+      assert response["due_date"] == nil
+    end
+
+    test "renders updated todo with only due_date", %{conn: conn, todo_id: id} do
+      due_date_string = DateTime.utc_now() |> DateTime.add(3, :day) |> DateTime.to_iso8601()
+      update_attrs = %{due_date: due_date_string}
+      conn = put(conn, ~p"/api/todos/#{id}", todo: update_attrs)
+      response = json_response(conn, 200)["data"]
+      assert response["id"] == id
+      assert response["name"] == "Edit Me"
+      assert response["description"] == "This is the description"
+      assert response["status"] == "not_started"
+      assert response["due_date"] == due_date_string
+    end
+
     test "returns 404 when trying to update non-existent todo", %{conn: conn} do
       non_existent_id = Ecto.UUID.generate()
       update_attrs = %{name: "Doesn't Matter"}
