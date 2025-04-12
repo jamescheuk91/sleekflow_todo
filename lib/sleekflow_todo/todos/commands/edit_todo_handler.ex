@@ -65,10 +65,13 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandler do
   end
 
   # Individual validators (now take the whole command)
+  # Allow nil name during edit, only validate if provided
+  defp validate_name(%EditTodo{name: nil}), do: :ok
+
   defp validate_name(%EditTodo{name: name}) do
-    # Check if name is nil or an empty/short string
+    # Check if name is an empty/short string *only if it's not nil*
     cond do
-      is_nil(name) or name == "" ->
+      name == "" -> # Simplified check, as nil is handled above
         {:error, {:name, "Name is required"}}
       is_binary(name) and String.length(name) >= 2 ->
         :ok

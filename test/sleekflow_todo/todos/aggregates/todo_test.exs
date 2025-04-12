@@ -3,7 +3,6 @@ defmodule SleekFlowTodo.Todos.Aggregates.TodoTest do
 
   alias SleekFlowTodo.Todos.Aggregates.Todo
   alias SleekFlowTodo.Todos.Events.TodoAdded
-  alias SleekFlowTodo.Todos.Commands.EditTodo
   alias SleekFlowTodo.Todos.Events.TodoEdited
 
   test "add_todo/6 returns TodoAdded event" do
@@ -80,7 +79,7 @@ defmodule SleekFlowTodo.Todos.Aggregates.TodoTest do
     assert updated_state.due_date == later
     assert updated_state.status == :in_progress
     assert updated_state.added_at == now
-    assert updated_state.updated_at != nil
+    assert !is_nil(updated_state.updated_at)
     assert DateTime.diff(DateTime.utc_now(), updated_state.updated_at) < 2
   end
 end

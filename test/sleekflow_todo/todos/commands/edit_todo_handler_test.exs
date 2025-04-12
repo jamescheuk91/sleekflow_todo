@@ -62,7 +62,7 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandlerTest do
     test "returns error for missing name" do
       command = %EditTodo{
         todo_id: @valid_todo_id,
-        name: nil,
+        name: "",
         description: "Description",
         due_date: nil,
         status: :not_started
