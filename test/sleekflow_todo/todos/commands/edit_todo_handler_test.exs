@@ -4,7 +4,6 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandlerTest do
   alias SleekFlowTodo.Todos.Commands.{EditTodo, EditTodoHandler}
   alias SleekFlowTodo.Todos.Aggregates.Todo
   alias SleekFlowTodo.Todos.Events.TodoEdited
-  alias SleekFlowTodo.Todos.TodoError
 
   @valid_todo_id Commanded.UUID.uuid4()
   @initial_aggregate_state %Todo{

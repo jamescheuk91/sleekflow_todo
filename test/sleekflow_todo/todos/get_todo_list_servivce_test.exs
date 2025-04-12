@@ -175,7 +175,7 @@ defmodule SleekFlowTodo.Todos.GetTodoListServiceTest do
       # Filter not_started, sort by due date descending
       todos =
         GetTodoListService.list_todos(
-          filters: %{status: "not_started"},
+          filters: %{status: :not_started},
           sort: %{field: :due_date, direction: :desc}
         )
 
