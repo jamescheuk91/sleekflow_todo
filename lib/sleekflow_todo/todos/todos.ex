@@ -4,11 +4,10 @@ defmodule SleekFlowTodo.Todos do
   """
   require Logger
 
-  alias SleekFlowTodo.CommandedApplication
   alias SleekFlowTodo.Todos.GetTodoListService
   alias SleekFlowTodo.Todos.AddTodoService
-  alias SleekFlowTodo.Todos.Commands.EditTodo
   alias SleekFlowTodo.Todos.GetTodoItemService
+  alias SleekFlowTodo.Todos.EditTodoService
 
   @doc """
     Returns a list of all todo items from the read model, optionally filtered and sorted.
@@ -36,46 +35,8 @@ defmodule SleekFlowTodo.Todos do
   """
   defdelegate add_todo(attrs \\ %{}), to: AddTodoService
 
-  def edit_todo(todo_id, attrs = %{}) do
-    Logger.debug("[Todos.edit_todo] Received attributes: #{inspect(attrs)}")
-
-    command_attrs = Map.put(attrs, :todo_id, todo_id)
-    Logger.debug("[Todos.edit_todo] Command attributes: #{inspect(command_attrs)}")
-
-    with command = build_edit_todo_command(command_attrs),
-         :ok <- dispatch_edit_todo_command(command) do
-      Logger.debug("[Todos.edit_todo] Command dispatched successfully. Returning {:ok, todo_id}")
-      {:ok, command.todo_id}
-    else
-      # Error from dispatch_add_todo_command
-      {:error, {:dispatch, error_details}} ->
-        Logger.error("[Todos.edit_todo] Dispatch error: #{inspect(error_details)}")
-        {:error, error_details}
-
-      # Catch-all for unexpected errors (e.g., if helpers return something else)
-      other_error ->
-        Logger.error("[Todos.edit_todo] Unexpected error: #{inspect(other_error)}")
-        {:error, {:unexpected, "An unexpected error occurred: #{inspect(other_error)}"}}
-    end
-  end
-
-  defp build_edit_todo_command(attrs) do
-    struct(EditTodo, attrs)
-  end
-
-  # Helper returning :ok or {:error, {:dispatch, reason}}
-  defp dispatch_edit_todo_command(command) do
-    Logger.debug("[Todos.dispatch_edit_todo_command] Dispatching command: #{inspect(command)}")
-
-    case CommandedApplication.dispatch(command, consistency: :strong) do
-      :ok ->
-        Logger.debug("[Todos.dispatch_edit_todo_command] Dispatch successful.")
-        :ok
-
-      {:error, reason} ->
-        Logger.error("[Todos.dispatch_edit_todo_command] Dispatch failed: #{inspect(reason)}")
-        # Tag the error source
-        {:error, {:dispatch, reason}}
-    end
-  end
+  @doc """
+  Edits an existing todo item. Delegates to `SleekFlowTodo.Todos.EditTodoService`.
+  """
+  defdelegate edit_todo(todo_id, attrs \\ %{}), to: EditTodoService
 end
