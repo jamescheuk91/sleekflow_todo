@@ -61,6 +61,7 @@ defmodule SleekFlowTodo.Todos.EditTodoService do
       "[EditTodoService.build_edit_todo_command] Building EditTodo command with attrs: #{inspect(attrs)}"
     )
 
+    # Priority will be included if present in attrs, otherwise ignored by struct/2
     struct(EditTodo, attrs)
   end
 
