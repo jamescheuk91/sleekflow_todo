@@ -133,15 +133,19 @@ defmodule SleekFlowTodoWeb.TodoController do
 
     filters =
       case Map.get(params, "status") do
-        nil -> filters
+        nil ->
+          filters
+
         status_string when is_binary(status_string) ->
           case String.to_existing_atom(status_string) do
             atom when is_atom(atom) -> Map.put(filters, :status, atom)
             # Ignore invalid status strings for filtering
             _ -> filters
           end
+
         # Ignore non-string status params
-        _ -> filters
+        _ ->
+          filters
       end
 
     case Map.get(params, "due_date") do

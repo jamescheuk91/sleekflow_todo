@@ -16,7 +16,8 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandler do
       &validate_name/1,
       &validate_description/1,
       &validate_due_date/1,
-      &validate_status/1
+      &validate_status/1,
+      &validate_tags/1
     ]
 
     case validate(command, validators) do
@@ -26,10 +27,11 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandler do
           name: name,
           description: description,
           due_date: due_date,
-          status: status
+          status: status,
+          tags: tags
         } = command
 
-        result = Todo.edit(aggregate, todo_id, name, description, due_date, status)
+        result = Todo.edit(aggregate, todo_id, name, description, due_date, status, tags)
         {:ok, result}
 
       {:error, error_details} ->
@@ -71,10 +73,13 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandler do
   defp validate_name(%EditTodo{name: name}) do
     # Check if name is an empty/short string *only if it's not nil*
     cond do
-      name == "" -> # Simplified check, as nil is handled above
+      # Simplified check, as nil is handled above
+      name == "" ->
         {:error, {:name, "Name is required"}}
+
       is_binary(name) and String.length(name) >= 2 ->
         :ok
+
       true ->
         {:error, {:name, "Name must be at least 2 characters"}}
     end
@@ -115,6 +120,22 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandler do
       :ok
     else
       {:error, {:status, "Invalid status"}}
+    end
+  end
+
+  # Validate tags - allow nil, otherwise must be list of strings
+  defp validate_tags(%EditTodo{tags: nil}), do: :ok
+
+  defp validate_tags(%EditTodo{tags: tags}) do
+    cond do
+      is_list(tags) and Enum.all?(tags, &is_binary/1) ->
+        :ok
+
+      is_list(tags) ->
+        {:error, {:tags, "All tags must be strings"}}
+
+      true ->
+        {:error, {:tags, "Tags must be a list of strings"}}
     end
   end
 end

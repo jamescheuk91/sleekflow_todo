@@ -12,6 +12,7 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandlerTest do
     description: "Initial Description",
     due_date: DateTime.add(DateTime.utc_now(), 3600, :second),
     status: :not_started,
+    tags: ["initial"],
     added_at: DateTime.utc_now(),
     updated_at: DateTime.utc_now()
   }
@@ -25,7 +26,8 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandlerTest do
         name: "Updated Name",
         description: "Updated Description",
         due_date: future_date,
-        status: :in_progress
+        status: :in_progress,
+        tags: ["updated", "work"]
       }
 
       expected_event = %TodoEdited{
@@ -33,10 +35,12 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandlerTest do
         name: "Updated Name",
         description: "Updated Description",
         due_date: future_date,
-        status: :in_progress
+        status: :in_progress,
+        tags: ["updated", "work"]
       }
 
-      assert {:ok, ^expected_event} = EditTodoHandler.handle(@initial_aggregate_state, command)
+      assert {:ok, event} = EditTodoHandler.handle(@initial_aggregate_state, command)
+      assert event == expected_event
     end
 
     test "successfully edits a todo with optional fields as nil" do
@@ -45,7 +49,8 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandlerTest do
         name: "Only Name Updated",
         description: nil,
         due_date: nil,
-        status: nil
+        status: nil,
+        tags: nil
       }
 
       expected_event = %TodoEdited{
@@ -53,10 +58,12 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandlerTest do
         name: "Only Name Updated",
         description: nil,
         due_date: nil,
-        status: nil
+        status: nil,
+        tags: nil
       }
 
-      assert {:ok, ^expected_event} = EditTodoHandler.handle(@initial_aggregate_state, command)
+      assert {:ok, event} = EditTodoHandler.handle(@initial_aggregate_state, command)
+      assert event == expected_event
     end
 
     test "returns error for missing name" do
@@ -139,24 +146,70 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandlerTest do
                EditTodoHandler.handle(@initial_aggregate_state, command)
     end
 
-    test "returns multiple errors if multiple fields are invalid" do
+    test "returns error for invalid tags (not a list, not nil)" do
       command = %EditTodo{
         todo_id: @valid_todo_id,
-        name: "N", # Invalid: too short
+        name: "Valid Name",
+        tags: "not-a-list"
+      }
+
+      assert {:error, {:tags, "Tags must be a list of strings"}} ==
+               EditTodoHandler.handle(@initial_aggregate_state, command)
+    end
+
+    test "returns error for invalid tags (list contains non-string)" do
+      command = %EditTodo{
+        todo_id: @valid_todo_id,
+        name: "Valid Name",
+        tags: ["valid", 123]
+      }
+
+      assert {:error, {:tags, "All tags must be strings"}} ==
+               EditTodoHandler.handle(@initial_aggregate_state, command)
+    end
+
+    test "successfully edits with empty tags list" do
+      command = %EditTodo{
+        todo_id: @valid_todo_id,
+        tags: []
+      }
+
+      expected_event = %TodoEdited{
+        todo_id: @valid_todo_id,
+        name: nil,
         description: nil,
-        due_date: DateTime.add(DateTime.utc_now(), -100, :second), # Invalid: past date
-        status: :wrong_status # Invalid: unknown status
+        due_date: nil,
+        status: nil,
+        tags: []
+      }
+
+      assert {:ok, event} = EditTodoHandler.handle(@initial_aggregate_state, command)
+      assert event == expected_event
+    end
+
+    test "returns multiple errors including invalid tags" do
+      command = %EditTodo{
+        todo_id: @valid_todo_id,
+        # Invalid: too short
+        name: "N",
+        description: nil,
+        # Invalid: past date
+        due_date: DateTime.add(DateTime.utc_now(), -100, :second),
+        # Invalid: unknown status
+        status: :wrong_status,
+        # Invalid: not a list
+        tags: "not-a-list"
       }
 
       expected_errors = [
         {:name, "Name must be at least 2 characters"},
         {:due_date, "Due date must be in the future"},
-        {:status, "Invalid status"}
+        {:status, "Invalid status"},
+        {:tags, "Tags must be a list of strings"}
       ]
 
-      assert {:error, ^expected_errors} = EditTodoHandler.handle(@initial_aggregate_state, command)
+      assert {:error, errors} = EditTodoHandler.handle(@initial_aggregate_state, command)
+      assert errors == expected_errors
     end
-
-
   end
 end

@@ -23,13 +23,15 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
 
       # Assuming add_todo defaults to not_started or handles string status correctly
       # We'll create one explicitly completed
-      todo_id_not_started_1 = create_todo_and_wait(%{name: "Not Started 1", due_date: due_date_1}) # Default status
-      todo_id_not_started_2 = create_todo_and_wait(%{name: "Not Started 2", due_date: due_date_2}) # Default status
+      # Default status
+      todo_id_not_started_1 = create_todo_and_wait(%{name: "Not Started 1", due_date: due_date_1})
+      # Default status
+      todo_id_not_started_2 = create_todo_and_wait(%{name: "Not Started 2", due_date: due_date_2})
 
       {:ok,
        todo_ids: %{
          not_started_1: todo_id_not_started_1,
-         not_started_2: todo_id_not_started_2,
+         not_started_2: todo_id_not_started_2
        },
        due_dates: %{
          date_1: due_date_1,
@@ -62,7 +64,7 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
       conn = get(conn, ~p"/api/todos?status=not_started")
       response = json_response(conn, 200)["data"]
       assert length(response) == 2
-      response_ids = Enum.map(response, &(&1["id"]))
+      response_ids = Enum.map(response, & &1["id"])
       assert ids.not_started_1 in response_ids
       assert ids.not_started_2 in response_ids
     end
@@ -78,28 +80,33 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
       conn = get(conn, ~p"/api/todos?due_date=#{date_str}")
       response = json_response(conn, 200)["data"]
       assert length(response) == 1
-      response_ids = Enum.map(response, &(&1["id"]))
+      response_ids = Enum.map(response, & &1["id"])
       assert ids.not_started_1 in response_ids
       refute ids.not_started_2 in response_ids
     end
 
-    test "filters todo items by status and due_date", %{conn: conn, todo_ids: ids, due_dates: dates} do
+    test "filters todo items by status and due_date", %{
+      conn: conn,
+      todo_ids: ids,
+      due_dates: dates
+    } do
       date_str = DateTime.to_iso8601(dates.date_1)
       conn = get(conn, ~p"/api/todos?status=not_started&due_date=#{date_str}")
       response = json_response(conn, 200)["data"]
       assert length(response) == 1
-      response_ids = Enum.map(response, &(&1["id"]))
+      response_ids = Enum.map(response, & &1["id"])
       assert ids.not_started_1 in response_ids
       refute ids.not_started_2 in response_ids
     end
 
     test "returns empty list for non-matching status", %{conn: conn} do
-      conn = get(conn, ~p"/api/todos?status=in_progress") # Use a valid but unassigned status
+      # Use a valid but unassigned status
+      conn = get(conn, ~p"/api/todos?status=in_progress")
       response = json_response(conn, 200)["data"]
       assert response == []
     end
 
-     test "returns empty list for non-matching due_date", %{conn: conn} do
+    test "returns empty list for non-matching due_date", %{conn: conn} do
       date_str = DateTime.to_iso8601(~U[2024-12-31 23:59:59Z])
       conn = get(conn, ~p"/api/todos?due_date=#{date_str}")
       response = json_response(conn, 200)["data"]
@@ -112,7 +119,6 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
       response = json_response(conn, 200)["data"]
       assert length(response) == 2
     end
-
   end
 
   describe "create todo" do
@@ -129,11 +135,19 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
       assert response["due_date"] == nil
       assert response["added_at"]
       assert response["updated_at"]
+      assert response["tags"] == []
     end
 
     test "renders todo with all attributes", %{conn: conn} do
       due_date_string = DateTime.utc_now() |> DateTime.add(1, :day) |> DateTime.to_iso8601()
-      attrs = %{name: "Test Todo", description: "Test Description", due_date: due_date_string}
+
+      attrs = %{
+        name: "Test Todo",
+        description: "Test Description",
+        due_date: due_date_string,
+        tags: ["test1"]
+      }
+
       conn = post(conn, ~p"/api/todos", todo: attrs)
       response = json_response(conn, 201)["data"]
 
@@ -144,8 +158,8 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
       assert response["due_date"] == due_date_string
       assert response["added_at"]
       assert response["updated_at"]
+      assert response["tags"] == ["test1"]
     end
-
 
     test "renders error when name is missing", %{conn: conn} do
       attrs = %{name: nil}
@@ -179,22 +193,43 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
   end
 
   describe "show todo" do
-    setup do
-      # Create a todo to be fetched
+    test "renders the specific todo item", %{conn: conn} do
       attrs = %{name: "Show Me", description: "This is the description"}
       todo_id = create_todo_and_wait(attrs)
-      {:ok, todo_id: todo_id}
-    end
-
-    test "renders the specific todo item", %{conn: conn, todo_id: id} do
-      conn = get(conn, ~p"/api/todos/#{id}")
+      conn = get(conn, ~p"/api/todos/#{todo_id}")
       response = json_response(conn, 200)["data"]
 
-      assert response["id"] == id
+      assert response["id"] == todo_id
       assert response["name"] == "Show Me"
       assert response["description"] == "This is the description"
-      assert response["status"] == "not_started" # Assuming default status
-      assert response["due_date"] == nil         # Assuming nil if not provided
+      # Assuming default status
+      assert response["status"] == "not_started"
+      # Assuming nil if not provided
+      assert response["due_date"] == nil
+    end
+
+    test "renders the specific todo item with all attribtutes", %{conn: conn} do
+
+      due_date = DateTime.utc_now() |> DateTime.add(1, :day)
+      due_date_string = due_date |> DateTime.to_iso8601()
+
+      attrs = %{
+        name: "Show Me",
+        description: "This is the description",
+        due_date: due_date,
+        tags: ["test1"]
+      }
+
+      todo_id = create_todo_and_wait(attrs)
+      conn = get(conn, ~p"/api/todos/#{todo_id}")
+      response = json_response(conn, 200)["data"]
+
+      assert response["id"] == todo_id
+      assert response["name"] == "Show Me"
+      assert response["description"] == "This is the description"
+      assert response["status"] == "not_started"
+      assert response["due_date"] == due_date_string
+      assert response["tags"] == ["test1"]
     end
 
     test "returns 404 when todo does not exist", %{conn: conn} do
@@ -215,6 +250,7 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
 
     test "renders updated todo when data is valid", %{conn: conn, todo_id: id} do
       due_date_string = DateTime.utc_now() |> DateTime.add(3, :day) |> DateTime.to_iso8601()
+
       update_attrs = %{
         name: "Updated Name",
         description: "Updated Description",
@@ -240,8 +276,23 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
 
       assert response["id"] == id
       assert response["name"] == "Just Updated Name"
-      assert response["description"] == "This is the description" # Original description
-      assert response["status"] == "not_started" # Original status
+      # Original description
+      assert response["description"] == "This is the description"
+      # Original status
+      assert response["status"] == "not_started"
+      assert response["due_date"] == nil
+      assert response["tags"] == []
+    end
+
+    test "redners updated todo with updaing tags only", %{conn: conn, todo_id: id} do
+      update_attrs = %{tags: ["test1", "test2"]}
+      conn = put(conn, ~p"/api/todos/#{id}", todo: update_attrs)
+      response = json_response(conn, 200)["data"]
+      assert response["tags"] == ["test1", "test2"]
+      assert response["name"] == "Edit Me"
+      assert response["description"] == "This is the description"
+      assert response["status"] == "not_started"
+      assert response["due_date"] == nil
     end
 
     test "renders error when name is too short on update", %{conn: conn, todo_id: id} do
@@ -332,5 +383,4 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
       # assert json_response(conn, 404)["errors"] != nil
     end
   end
-
 end

@@ -16,6 +16,7 @@ defmodule SleekFlowTodo.Todos.GetTodoItemServiceTest do
           description: "Description A",
           due_date: due_date_1,
           added_at: now,
+          tags: ["tag1", "tag2"]
         }
         |> Todos.add_todo()
 
@@ -25,6 +26,7 @@ defmodule SleekFlowTodo.Todos.GetTodoItemServiceTest do
       assert found_todo.description == "Description A"
       assert found_todo.due_date == due_date_1
       assert found_todo.status == :not_started
+      assert found_todo.tags == ["tag1", "tag2"]
     end
 
     test "returns nil if the todo item does not exist" do

@@ -20,6 +20,7 @@ defmodule SleekFlowTodo.Todos.TodoReadModelProjector do
       description: event.description,
       status: String.to_existing_atom(event.status),
       due_date: event.due_date,
+      tags: event.tags,
       added_at: event.added_at
     }
 
@@ -29,12 +30,17 @@ defmodule SleekFlowTodo.Todos.TodoReadModelProjector do
 
   project(%TodoEdited{} = event, _metadata, fn multi ->
     todo = SleekFlowTodo.ProjectionRepo.get!(TodoReadModel, event.todo_id)
+
     attrs =
       Map.from_struct(event)
+      |> Map.put_new(:tags, nil)
       |> Map.update(:status, nil, fn
-        nil -> nil # Keep it nil if it's nil initially
-        status_str when is_binary(status_str) -> String.to_existing_atom(status_str) # Convert if it's a string
-        atom when is_atom(atom) -> atom # Keep it if it's already an atom
+        # Keep it nil if it's nil initially
+        nil -> nil
+        # Convert if it's a string
+        status_str when is_binary(status_str) -> String.to_existing_atom(status_str)
+        # Keep it if it's already an atom
+        atom when is_atom(atom) -> atom
       end)
       # Filter out keys where the value is nil *after* potential status conversion
       |> Enum.reject(fn {_, v} -> is_nil(v) end)
@@ -51,11 +57,11 @@ defmodule SleekFlowTodo.Todos.TodoReadModelProjector do
           "[TodoReadModelProjector] Received TodoRemoved for non-existent read model: #{event.todo_id}"
         )
 
-        multi # Return multi unchanged if record not found
+        # Return multi unchanged if record not found
+        multi
 
       todo ->
         Ecto.Multi.delete(multi, :delete_todo_read_model, todo)
     end
   end)
-
 end

@@ -180,4 +180,121 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandlerTest do
               {:due_date, "Due date must be in the future"}
             ]} = AddTodoHandler.handle(aggregate, command)
   end
+
+  test "handle/2 AddTodo command with valid tags" do
+    todo_id = Commanded.UUID.uuid4()
+    added_at_dt = DateTime.utc_now()
+    next_day_dt = DateTime.add(added_at_dt, 1, :day)
+
+    aggregate = %Todo{}
+
+    command = %AddTodo{
+      todo_id: todo_id,
+      name: "Buy milk",
+      description: "Buy milk description",
+      due_date: next_day_dt,
+      tags: ["home", "errands"],
+      added_at: added_at_dt
+    }
+
+    assert {:ok, %TodoAdded{}} = AddTodoHandler.handle(aggregate, command)
+  end
+
+  test "handle/2 AddTodo command with valid tags in event" do
+    todo_id = Commanded.UUID.uuid4()
+    added_at_dt = DateTime.utc_now()
+    next_day_dt = DateTime.add(added_at_dt, 1, :day)
+
+    aggregate = %Todo{}
+
+    command = %AddTodo{
+      todo_id: todo_id,
+      name: "Buy milk",
+      description: "Buy milk description",
+      due_date: next_day_dt,
+      tags: ["home", "errands"],
+      added_at: added_at_dt
+    }
+
+    assert {:ok, %TodoAdded{}} = AddTodoHandler.handle(aggregate, command)
+  end
+
+  test "handle/2 AddTodo command with invalid tags (not a list)" do
+    command = %AddTodo{
+      todo_id: Commanded.UUID.uuid4(),
+      name: "Invalid Tags",
+      description: "Valid Desc",
+      tags: "not-a-list",
+      added_at: DateTime.utc_now()
+    }
+
+    aggregate = %Todo{}
+
+    assert {:error, {:tags, "Tags must be a list of strings"}} ==
+             AddTodoHandler.handle(aggregate, command)
+  end
+
+  test "handle/2 AddTodo command with invalid tags (list contains non-string)" do
+    command = %AddTodo{
+      todo_id: Commanded.UUID.uuid4(),
+      name: "Invalid Tags",
+      description: "Valid Desc",
+      tags: ["valid", 123, "another"],
+      added_at: DateTime.utc_now()
+    }
+
+    aggregate = %Todo{}
+
+    assert {:error, {:tags, "All tags must be strings"}} ==
+             AddTodoHandler.handle(aggregate, command)
+  end
+
+  test "handle/2 AddTodo command with empty list for tags" do
+    future_date = DateTime.add(DateTime.utc_now(), 3600, :second)
+    added_at = DateTime.utc_now()
+
+    command = %AddTodo{
+      todo_id: Commanded.UUID.uuid4(),
+      name: "Valid Name",
+      description: "Valid Description",
+      tags: [],
+      due_date: future_date,
+      added_at: added_at
+    }
+
+    aggregate = %Todo{}
+
+    expected_event = %TodoAdded{
+      todo_id: command.todo_id,
+      name: command.name,
+      description: command.description,
+      status: :not_started,
+      due_date: command.due_date,
+      tags: command.tags,
+      added_at: command.added_at
+    }
+
+    assert {:ok, event} = AddTodoHandler.handle(aggregate, command)
+    assert event == expected_event
+  end
+
+  test "handle/2 AddTodo command fails due to invalid name and invalid tags" do
+    added_at_dt = DateTime.utc_now()
+
+    command = %AddTodo{
+      todo_id: Commanded.UUID.uuid4(),
+      name: "a",
+      description: "Bbbb",
+      tags: "not-a-list",
+      added_at: added_at_dt
+    }
+
+    aggregate = %Todo{}
+
+    assert {:error,
+            [
+              {:name, "Name must be at least 2 characters"},
+              {:tags, "Tags must be a list of strings"}
+            ]} = AddTodoHandler.handle(aggregate, command)
+  end
 end

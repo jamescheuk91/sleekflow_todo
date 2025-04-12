@@ -9,10 +9,11 @@ defmodule SleekFlowTodo.Todos.Aggregates.TodoTest do
     todo_id = Commanded.UUID.uuid4()
     next_day = DateTime.add(DateTime.utc_now(), 1, :day)
     now = DateTime.utc_now()
+    tags = ["tag1", "tag2"]
 
     assert %TodoAdded{} =
              event =
-             Todo.add(%Todo{}, todo_id, "Buy milk", "Buy milk description", next_day, now)
+             Todo.add(%Todo{}, todo_id, "Buy milk", "Buy milk description", next_day, tags, now)
 
     assert event.todo_id == todo_id
     assert event.name == "Buy milk"
@@ -20,12 +21,14 @@ defmodule SleekFlowTodo.Todos.Aggregates.TodoTest do
     assert event.due_date == next_day
     assert event.added_at == now
     assert event.status == :not_started
+    assert event.tags == tags
   end
 
   test "apply/2 TodoAdded event to Todo aggregate" do
     todo_id = Commanded.UUID.uuid4()
     next_day = DateTime.add(DateTime.utc_now(), 1, :day)
     now = DateTime.utc_now()
+    tags = []
 
     state = %Todo{}
 
@@ -34,6 +37,8 @@ defmodule SleekFlowTodo.Todos.Aggregates.TodoTest do
       name: "Buy milk",
       description: "Buy milk description",
       due_date: next_day,
+      status: :not_started,
+      tags: tags,
       added_at: now
     }
 
@@ -42,8 +47,11 @@ defmodule SleekFlowTodo.Todos.Aggregates.TodoTest do
              name: "Buy milk",
              description: "Buy milk description",
              due_date: ^next_day,
+             status: :not_started,
+             tags: ^tags,
              added_at: ^now,
-             status: :not_started
+             updated_at: nil,
+             deleted: false
            } = Todo.apply(state, event)
   end
 

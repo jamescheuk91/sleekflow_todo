@@ -15,7 +15,8 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandler do
     validators = [
       &validate_name/1,
       &validate_description/1,
-      &validate_due_date/1
+      &validate_due_date/1,
+      &validate_tags/1
     ]
 
     case validate(command, validators) do
@@ -25,10 +26,11 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandler do
           name: name,
           description: description,
           due_date: due_date,
+          tags: tags,
           added_at: added_at
         } = command
 
-        result = Todo.add(aggregate, todo_id, name, description, due_date, added_at)
+        result = Todo.add(aggregate, todo_id, name, description, due_date, tags, added_at)
         {:ok, result}
 
       {:error, error_details} ->
@@ -99,6 +101,20 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandler do
     else
       # Handle cases where due_date is not a DateTime struct
       {:error, {:due_date, "Invalid due date format"}}
+    end
+  end
+
+  # Validate tags - must be a list of strings
+  defp validate_tags(%AddTodo{tags: tags}) do
+    cond do
+      is_list(tags) and Enum.all?(tags, &is_binary/1) ->
+        :ok
+
+      is_list(tags) ->
+        {:error, {:tags, "All tags must be strings"}}
+
+      true ->
+        {:error, {:tags, "Tags must be a list of strings"}}
     end
   end
 end

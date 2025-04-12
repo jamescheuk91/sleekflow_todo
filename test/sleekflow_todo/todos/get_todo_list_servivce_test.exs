@@ -46,7 +46,6 @@ defmodule SleekFlowTodo.Todos.GetTodoListServiceTest do
       }
       |> ProjectionRepo.insert!()
 
-
     # Return the created todos for potential use in tests, although we'll query them
     {:ok, todos: [todo1, todo2, todo3], due_dates: [due_date_1, due_date_2]}
   end
@@ -69,7 +68,7 @@ defmodule SleekFlowTodo.Todos.GetTodoListServiceTest do
       assert length(todos_empty) == 0
     end
 
-    test "filters todos by due_date", %{due_dates: [due_date_1,_]} do
+    test "filters todos by due_date", %{due_dates: [due_date_1, _]} do
       todos = GetTodoListService.list_todos(filters: %{due_date: due_date_1})
       assert length(todos) == 1
       assert hd(todos).name == "Task A"
@@ -81,9 +80,7 @@ defmodule SleekFlowTodo.Todos.GetTodoListServiceTest do
 
     test "filters todos by status and due_date", %{due_dates: [due_date_1, _]} do
       todos =
-        GetTodoListService.list_todos(
-          filters: %{status: "not_started", due_date: due_date_1}
-        )
+        GetTodoListService.list_todos(filters: %{status: "not_started", due_date: due_date_1})
 
       assert length(todos) == 1
       assert hd(todos).name == "Task A"

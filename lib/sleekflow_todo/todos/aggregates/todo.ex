@@ -15,9 +15,9 @@ defmodule SleekFlowTodo.Todos.Aggregates.Todo do
     :description,
     :due_date,
     :status,
+    :tags,
     :added_at,
     :updated_at,
-    :completed_at,
     deleted: false
   ]
 
@@ -27,14 +27,24 @@ defmodule SleekFlowTodo.Todos.Aggregates.Todo do
           description: String.t() | nil,
           due_date: DateTime.t() | nil,
           status: :not_started | :in_progress | :completed,
+          tags: list(String.t()) | nil,
           added_at: DateTime.t() | nil,
           updated_at: DateTime.t() | nil,
-          completed_at: DateTime.t() | nil,
           deleted: boolean()
         }
 
-  def add(%Todo{todo_id: nil, deleted: false} = _aggregate_state, todo_id, name, description, due_date, added_at) do
-    Logger.debug("[Todo.add] Params: todo_id=#{todo_id}, name=#{name}, description=#{description}, due_date=#{inspect(due_date)}, added_at=#{inspect(added_at)}")
+  def add(
+        %Todo{todo_id: nil, deleted: false} = _aggregate_state,
+        todo_id,
+        name,
+        description,
+        due_date,
+        tags,
+        added_at
+      ) do
+    Logger.debug(
+      "[Todo.add] Params: todo_id=#{todo_id}, name=#{name}, description=#{description}, due_date=#{inspect(due_date)}, tags=#{inspect(tags)}, added_at=#{inspect(added_at)}"
+    )
 
     %TodoAdded{
       todo_id: todo_id,
@@ -42,6 +52,7 @@ defmodule SleekFlowTodo.Todos.Aggregates.Todo do
       description: description,
       status: :not_started,
       due_date: due_date,
+      tags: tags,
       added_at: added_at
     }
   end
@@ -52,16 +63,20 @@ defmodule SleekFlowTodo.Todos.Aggregates.Todo do
         name,
         description,
         due_date,
-        status
+        status,
+        tags
       ) do
-    Logger.debug("[Todo.edit] Params: todo_id: #{todo_id}, name: #{name}, description: #{description}, due_date: #{inspect(due_date)}, status: #{status}")
+    Logger.debug(
+      "[Todo.edit] Params: todo_id: #{todo_id}, name: #{name}, description: #{description}, due_date: #{inspect(due_date)}, status: #{status}, tags: #{inspect(tags)}"
+    )
 
     %TodoEdited{
       todo_id: todo_id,
       name: name,
       description: description,
       due_date: due_date,
-      status: status
+      status: status,
+      tags: tags
     }
   end
 
@@ -79,21 +94,24 @@ defmodule SleekFlowTodo.Todos.Aggregates.Todo do
         name: event.name,
         description: event.description,
         due_date: event.due_date,
-        added_at: event.added_at,
-        status: :not_started,
-        deleted: false
+        status: event.status,
+        tags: event.tags,
+        added_at: event.added_at
     }
   end
 
   def apply(%__MODULE__{} = state, %TodoEdited{} = event) do
     Logger.debug("[Todo.apply(TodoEdited)] Applying event: #{inspect(event)}")
 
+    updated_tags = if is_nil(event.tags), do: state.tags, else: event.tags
+
     %__MODULE__{
       state
-      | name: event.name,
-        description: event.description,
-        due_date: event.due_date,
-        status: event.status,
+      | name: event.name || state.name,
+        description: event.description || state.description,
+        due_date: event.due_date || state.due_date,
+        status: event.status || state.status,
+        tags: updated_tags,
         updated_at: DateTime.utc_now()
     }
   end

@@ -12,5 +12,6 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodo do
     field :description, String.t()
     field :due_date, DateTime.t()
     field :status, Ecto.Enum, values: [:not_started, :in_progress, :completed]
+    field :tags, list(String.t())
   end
 end

@@ -14,15 +14,17 @@ defmodule SleekFlowTodo.Todos.TodoReadModel do
     # Using string representation for flexibility in read model consumers
     field :status, Ecto.Enum, values: [:not_started, :in_progress, :completed]
     field :due_date, :utc_datetime_usec
+    field :tags, {:array, :string}
     field :added_at, :utc_datetime_usec
 
     # Timestamps reflect when the projection was last updated
     timestamps(type: :utc_datetime_usec)
   end
 
+  @doc false
   def changeset(todo, attrs) do
     todo
-    |> cast(attrs, [:name, :description, :status, :due_date, :updated_at])
-    # Add validations if needed for the read model specifically
+    |> cast(attrs, [:name, :description, :status, :due_date, :tags])
+    |> validate_required([:name, :status, :added_at])
   end
 end

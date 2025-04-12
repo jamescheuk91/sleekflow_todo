@@ -55,7 +55,8 @@ defmodule SleekFlowTodo.Todos.GetTodoListService do
   """
   def filter_query(filters) do
     Enum.reduce(filters, dynamic(true), fn
-      {:status, status}, dynamic when is_atom(status) and status in [:not_started, :in_progress, :completed] ->
+      {:status, status}, dynamic
+      when is_atom(status) and status in [:not_started, :in_progress, :completed] ->
         dynamic([q], q.status == ^status and ^dynamic)
 
       {:due_date, due_date}, dynamic when is_struct(due_date, DateTime) ->
@@ -72,7 +73,8 @@ defmodule SleekFlowTodo.Todos.GetTodoListService do
        when field in [:due_date, :status, :name] and direction in [:asc, :desc] do
     # Construct the order_by keyword list dynamically
     order_by_opts = Keyword.put([], direction, field)
-    order_by(query, ^order_by_opts) # Use the dynamically created keyword list
+    # Use the dynamically created keyword list
+    order_by(query, ^order_by_opts)
   end
 
   # Apply default sort if sort_opts are invalid or nil

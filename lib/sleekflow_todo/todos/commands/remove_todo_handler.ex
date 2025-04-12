@@ -13,6 +13,7 @@ defmodule SleekFlowTodo.Todos.Commands.RemoveTodoHandler do
     Logger.debug("[RemoveTodoHandler] Received command: #{inspect(command)}")
     %RemoveTodo{todo_id: todo_id, removed_at: removed_at} = command
     event = Todo.remove(aggregate, todo_id, removed_at)
-    {:ok, event}             # Assuming success returns the event
+    # Assuming success returns the event
+    {:ok, event}
   end
 end

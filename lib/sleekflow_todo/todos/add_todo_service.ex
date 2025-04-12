@@ -23,7 +23,10 @@ defmodule SleekFlowTodo.Todos.AddTodoService do
 
     with command = build_add_todo_command(command_attrs),
          :ok <- dispatch_add_todo_command(command) do
-      Logger.debug("[AddTodoService.add_todo] Command dispatched successfully. Returning {:ok, todo_id}")
+      Logger.debug(
+        "[AddTodoService.add_todo] Command dispatched successfully. Returning {:ok, todo_id}"
+      )
+
       {:ok, todo_id}
     else
       # Error from dispatch_add_todo_command
@@ -43,12 +46,15 @@ defmodule SleekFlowTodo.Todos.AddTodoService do
       attrs
       |> Map.put(:added_at, DateTime.utc_now())
 
-    struct!(AddTodo, attrs) # Using struct! as errors are not expected here currently
+    # Using struct! as errors are not expected here currently
+    struct!(AddTodo, attrs)
   end
 
   # Helper returning :ok or {:error, {:dispatch, reason}}
   defp dispatch_add_todo_command(command) do
-    Logger.debug("[AddTodoService.dispatch_add_todo_command] Dispatching command: #{inspect(command)}")
+    Logger.debug(
+      "[AddTodoService.dispatch_add_todo_command] Dispatching command: #{inspect(command)}"
+    )
 
     case CommandedApplication.dispatch(command, consistency: :strong) do
       :ok ->
@@ -56,7 +62,10 @@ defmodule SleekFlowTodo.Todos.AddTodoService do
         :ok
 
       {:error, reason} ->
-        Logger.error("[AddTodoService.dispatch_add_todo_command] Dispatch failed: #{inspect(reason)}")
+        Logger.error(
+          "[AddTodoService.dispatch_add_todo_command] Dispatch failed: #{inspect(reason)}"
+        )
+
         # Tag the error source
         {:error, {:dispatch, reason}}
     end

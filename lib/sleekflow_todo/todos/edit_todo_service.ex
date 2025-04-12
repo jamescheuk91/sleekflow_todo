@@ -29,14 +29,19 @@ defmodule SleekFlowTodo.Todos.EditTodoService do
       {:error, {:dispatch, {:error, :command_error, %SleekflowTodo.Error{message: "Todo not found", type: :not_found}}}}}
   """
   def edit_todo(todo_id, attrs = %{}) do
-    Logger.debug("[EditTodoService.edit_todo] Received attributes: #{inspect(attrs)} for todo_id: #{todo_id}")
+    Logger.debug(
+      "[EditTodoService.edit_todo] Received attributes: #{inspect(attrs)} for todo_id: #{todo_id}"
+    )
 
     command_attrs = Map.put(attrs, :todo_id, todo_id)
     Logger.debug("[EditTodoService.edit_todo] Command attributes: #{inspect(command_attrs)}")
 
     with command = build_edit_todo_command(command_attrs),
          :ok <- dispatch_edit_todo_command(command) do
-      Logger.debug("[EditTodoService.edit_todo] Command dispatched successfully. Returning {:ok, todo_id}")
+      Logger.debug(
+        "[EditTodoService.edit_todo] Command dispatched successfully. Returning {:ok, todo_id}"
+      )
+
       {:ok, command.todo_id}
     else
       # Error from dispatch_edit_todo_command
@@ -52,13 +57,18 @@ defmodule SleekFlowTodo.Todos.EditTodoService do
   end
 
   defp build_edit_todo_command(attrs) do
-    Logger.debug("[EditTodoService.build_edit_todo_command] Building EditTodo command with attrs: #{inspect(attrs)}")
+    Logger.debug(
+      "[EditTodoService.build_edit_todo_command] Building EditTodo command with attrs: #{inspect(attrs)}"
+    )
+
     struct(EditTodo, attrs)
   end
 
   # Helper returning :ok or {:error, {:dispatch, reason}}
   defp dispatch_edit_todo_command(command) do
-    Logger.debug("[EditTodoService.dispatch_edit_todo_command] Dispatching command: #{inspect(command)}")
+    Logger.debug(
+      "[EditTodoService.dispatch_edit_todo_command] Dispatching command: #{inspect(command)}"
+    )
 
     case CommandedApplication.dispatch(command, consistency: :strong) do
       :ok ->
@@ -66,7 +76,10 @@ defmodule SleekFlowTodo.Todos.EditTodoService do
         :ok
 
       {:error, reason} ->
-        Logger.error("[EditTodoService.dispatch_edit_todo_command] Dispatch failed: #{inspect(reason)}")
+        Logger.error(
+          "[EditTodoService.dispatch_edit_todo_command] Dispatch failed: #{inspect(reason)}"
+        )
+
         # Tag the error source
         {:error, {:dispatch, reason}}
     end
