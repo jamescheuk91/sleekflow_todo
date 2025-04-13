@@ -4,12 +4,13 @@ defmodule SleekFlowTodoWeb.TodoController do
   alias SleekFlowTodo.Todos
   alias SleekFlowTodoWeb.TodoJSON
   alias SleekFlowTodoWeb.ErrorJSON
+  alias SleekFlowTodoWeb.TodoParamsParser
 
   action_fallback SleekFlowTodoWeb.FallbackController
 
   def index(conn, params) do
-    filters = parse_index_filters(params)
-    sort = parse_index_sort(params)
+    filters = TodoParamsParser.parse_index_filters(params)
+    sort = TodoParamsParser.parse_index_sort(params)
     opts = [filters: filters, sort: sort]
 
     todos = Todos.list_todos(opts)
@@ -20,13 +21,8 @@ defmodule SleekFlowTodoWeb.TodoController do
   end
 
   def create(conn, %{"todo" => todo_params}) do
-    params = SleekFlowTodo.Utils.key_to_atom(todo_params)
-    # Convert due_date from string to DateTime if present
-    params = parse_due_date(params)
-    # Convert priority from string to atom if present
-    params = parse_priority(params)
-
-    with {:ok, todo_id} <- Todos.add_todo(params),
+    with {:ok, parsed_params} <- TodoParamsParser.parse_create_params(todo_params),
+         {:ok, todo_id} <- Todos.add_todo(parsed_params),
          todo <- Todos.get_todo!(todo_id) do
       conn
       |> put_status(:created)
@@ -67,23 +63,14 @@ defmodule SleekFlowTodoWeb.TodoController do
         |> render("404.json", %{})
 
       _existing_todo ->
-        # Todo exists, proceed with the update logic
-        params = SleekFlowTodo.Utils.key_to_atom(todo_params)
-        # Convert due_date from string to DateTime if present
-        params = parse_due_date(params)
-        # Convert priority from string to atom if present
-        params = parse_priority(params)
-        params = parse_status(params)
-
-        with {:ok, todo_id} <- Todos.edit_todo(id, params),
-             # Fetch the updated todo state after the command is processed
+        with {:ok, parsed_params} <- TodoParamsParser.parse_update_params(todo_params),
+             {:ok, todo_id} <- Todos.edit_todo(id, parsed_params),
              updated_todo <- Todos.get_todo!(todo_id) do
           conn
           |> put_status(:ok)
           |> put_view(json: TodoJSON)
           |> render(:show, todo: updated_todo)
         else
-          # Handle errors from Todos.edit_todo (e.g., validation)
           {:error, reason} ->
             conn
             |> put_status(:unprocessable_entity)
@@ -106,7 +93,6 @@ defmodule SleekFlowTodoWeb.TodoController do
           send_resp(conn, :no_content, "")
         else
           {:error, reason} ->
-            # Log unexpected delete errors
             Logger.error("Error deleting todo #{id}: #{inspect(reason)}")
 
             conn
@@ -114,97 +100,6 @@ defmodule SleekFlowTodoWeb.TodoController do
             |> put_view(json: ErrorJSON)
             |> render(:error, reason: reason)
         end
-    end
-  end
-
-  defp parse_due_date(params) do
-    if Map.has_key?(params, :due_date) and is_binary(params.due_date) do
-      case DateTime.from_iso8601(params.due_date) do
-        {:ok, datetime, _offset} ->
-          Map.put(params, :due_date, datetime)
-
-        {:error, reason} ->
-          # Keep the original value, the validation in the command will handle the error
-          Logger.error("Failed to parse due_date: #{inspect(reason)}")
-          params
-      end
-    else
-      params
-    end
-  end
-
-  defp parse_status(params) do
-    if Map.has_key?(params, :status) and is_binary(params.status) do
-      Map.put(params, :status, String.to_existing_atom(params.status))
-    else
-      params
-    end
-  end
-
-  defp parse_priority(params) do
-    if Map.has_key?(params, :priority) and is_binary(params.priority) do
-      case String.to_existing_atom(params.priority) do
-        atom when is_atom(atom) ->
-          Map.put(params, :priority, atom)
-        _ ->
-          # Keep original value, validation will handle it
-          Logger.error("Invalid priority string received: #{inspect(params.priority)}")
-          params
-      end
-    else
-      params
-    end
-  end
-
-  defp parse_index_filters(params) do
-    filters = %{}
-
-    filters =
-      case Map.get(params, "status") do
-        nil ->
-          filters
-
-        status_string when is_binary(status_string) ->
-          case String.to_existing_atom(status_string) do
-            atom when is_atom(atom) -> Map.put(filters, :status, atom)
-            # Ignore invalid status strings for filtering
-            _ -> filters
-          end
-
-        # Ignore non-string status params
-        _ ->
-          filters
-      end
-
-    case Map.get(params, "due_date") do
-      nil ->
-        filters
-
-      date_string when is_binary(date_string) ->
-        case DateTime.from_iso8601(date_string) do
-          {:ok, datetime, _offset} ->
-            Map.put(filters, :due_date, datetime)
-
-          {:error, _} ->
-            # Ignore invalid date strings for filtering
-            filters
-        end
-
-      # Ignore non-string due_date params
-      _ ->
-        filters
-    end
-  end
-
-  defp parse_index_sort(params) do
-    with {:ok, field} <- Map.fetch(params, "sort_field"),
-         {:ok, direction} <- Map.fetch(params, "sort_direction"),
-         field_atom when is_atom(field_atom) <- String.to_existing_atom(field),
-         direction_atom when is_atom(direction_atom) <- String.to_existing_atom(direction) do
-      %{field: field_atom, direction: direction_atom}
-    else
-      _ ->
-        nil
     end
   end
 end
