@@ -10,7 +10,7 @@ defmodule SleekFlowTodo.Activities.ActivityFeedProjector do
 
   alias SleekFlowTodo.Todos.Events.TodoAdded
   alias SleekFlowTodo.Todos.Events.TodoEdited
-  alias SleekFlowTodo.Activities.ActivityFeedItem
+  alias SleekFlowTodo.Activities.ActivityFeedItemReadModel
 
   project(%TodoAdded{} = event, metadata, fn multi ->
     details = Map.take(event, [:name, :description, :status, :priority, :due_date, :tags])
@@ -18,7 +18,7 @@ defmodule SleekFlowTodo.Activities.ActivityFeedProjector do
     # Safely access metadata, defaulting to event.added_at
     occurred_at = Map.get(metadata, :inserted_at, event.added_at)
 
-    struct = %ActivityFeedItem{
+    struct = %ActivityFeedItemReadModel{
       id: Commanded.UUID.uuid4(),
       todo_id: event.todo_id,
       type: "todo_added",
@@ -38,7 +38,7 @@ defmodule SleekFlowTodo.Activities.ActivityFeedProjector do
       # Safely access metadata, defaulting to DateTime.utc_now()
       occurred_at = Map.get(metadata, :inserted_at, DateTime.utc_now())
 
-      struct = %ActivityFeedItem{
+      struct = %ActivityFeedItemReadModel{
         id: Commanded.UUID.uuid4(),
         todo_id: event.todo_id,
         type: "todo_edited",

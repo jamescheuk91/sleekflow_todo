@@ -6,7 +6,7 @@ defmodule SleekFlowTodo.Activities.GetActivityFeedService do
   import Ecto.Query, warn: false
 
   alias SleekFlowTodo.ProjectionRepo
-  alias SleekFlowTodo.Activities.ActivityFeedItem
+    alias SleekFlowTodo.Activities.ActivityFeedItemReadModel
 
   @doc """
   Retrieves a list of activity feed items, ordered by occurrence time (newest first).
@@ -18,7 +18,7 @@ defmodule SleekFlowTodo.Activities.GetActivityFeedService do
     offset = Keyword.get(opts, :offset, 0)
 
     query =
-      from(a in ActivityFeedItem,
+      from(a in ActivityFeedItemReadModel,
         order_by: [desc: a.occurred_at],
         limit: ^limit,
         offset: ^offset

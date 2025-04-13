@@ -1,5 +1,5 @@
 # lib/sleekflow_todo/activities/activity_feed_item_schema.ex
-defmodule SleekFlowTodo.Activities.ActivityFeedItem do
+defmodule SleekFlowTodo.Activities.ActivityFeedItemReadModel do
   @moduledoc """
   Ecto schema representing an item in the activity feed read model.
   """
