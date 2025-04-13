@@ -212,6 +212,57 @@
         "tags": [
           "Todos"
         ]
+      },
+      "put": {
+        "consumes": [
+          [
+            "application/json"
+          ]
+        ],
+        "description": "Update the details of a specific todo item",
+        "operationId": "SleekFlowTodoWeb.TodoController.update",
+        "parameters": [
+          {
+            "description": "Todo ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "x-example": "02ef07e0-eb4f-4fca-b6aa-c7993427cc10"
+          },
+          {
+            "description": "Todo object with updated details",
+            "in": "body",
+            "name": "todo",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Todo"
+            }
+          }
+        ],
+        "produces": [
+          [
+            "application/json"
+          ]
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Todo"
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Update an existing todo",
+        "tags": [
+          "Todos"
+        ]
       }
     }
   },

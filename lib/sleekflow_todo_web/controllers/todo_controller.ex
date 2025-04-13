@@ -63,6 +63,24 @@ defmodule SleekFlowTodoWeb.TodoController do
     response(404, "Not Found")
   end
 
+  swagger_path :update do
+    put("/todos/:id")
+    summary("Update an existing todo")
+    description("Update the details of a specific todo item")
+    consumes(["application/json"])
+    produces(["application/json"])
+    tag("Todos")
+
+    parameters do
+      id(:path, :string, "Todo ID", required: true, example: "02ef07e0-eb4f-4fca-b6aa-c7993427cc10")
+      todo(:body, Schema.ref(:Todo), "Todo object with updated details", required: true)
+    end
+
+    response(200, "OK", Schema.ref(:Todo))
+    response(404, "Not Found")
+    response(422, "Unprocessable Entity")
+  end
+
   def swagger_definitions do
     %{
       Todo:
