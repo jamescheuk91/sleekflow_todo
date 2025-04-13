@@ -21,7 +21,7 @@ defmodule SleekFlowTodo.Todos.AddTodoService do
     command_attrs = Map.put(attrs, :todo_id, todo_id)
     Logger.debug("[AddTodoService.add_todo] Command attributes: #{inspect(command_attrs)}")
 
-    with command = build_add_todo_command(command_attrs),
+    with {:ok, command} <- build_add_todo_command(command_attrs),
          :ok <- dispatch_add_todo_command(command) do
       Logger.debug(
         "[AddTodoService.add_todo] Command dispatched successfully. Returning {:ok, todo_id}"
@@ -33,6 +33,11 @@ defmodule SleekFlowTodo.Todos.AddTodoService do
       {:error, {:dispatch, error_details}} ->
         Logger.error("[AddTodoService.add_todo] Dispatch error: #{inspect(error_details)}")
         {:error, error_details}
+
+      # Error from build_add_todo_command
+      {:error, {:build, error}} ->
+        Logger.error("[AddTodoService.add_todo] Build command error: #{inspect(error)}")
+        {:error, {:unexpected, "Failed to build command: #{inspect(error)}"}}
 
       # Catch-all for unexpected errors
       other_error ->
@@ -47,7 +52,13 @@ defmodule SleekFlowTodo.Todos.AddTodoService do
       |> Map.put(:added_at, DateTime.utc_now())
 
     # Using struct! as errors are not expected here currently
-    struct!(AddTodo, attrs)
+    try do
+      {:ok, struct!(AddTodo, attrs)}
+    rescue
+      e in ArgumentError ->
+        Logger.error("[AddTodoService.build_add_todo_command] Error building struct: #{inspect(e)}")
+        {:error, {:build, e}}
+    end
   end
 
   # Helper returning :ok or {:error, {:dispatch, reason}}
