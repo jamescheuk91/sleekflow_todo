@@ -136,6 +136,46 @@
         "tags": [
           "Todos"
         ]
+      },
+      "post": {
+        "consumes": [
+          [
+            "application/json"
+          ]
+        ],
+        "description": "Add a new todo item to the list",
+        "operationId": "SleekFlowTodoWeb.TodoController.create",
+        "parameters": [
+          {
+            "description": "Todo object to create",
+            "in": "body",
+            "name": "todo",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Todo"
+            }
+          }
+        ],
+        "produces": [
+          [
+            "application/json"
+          ]
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Todo"
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Create a new todo",
+        "tags": [
+          "Todos"
+        ]
       }
     },
     "/todos/:id": {

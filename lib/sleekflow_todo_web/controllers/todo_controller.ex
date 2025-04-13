@@ -29,6 +29,22 @@ defmodule SleekFlowTodoWeb.TodoController do
     response(200, "Success")
   end
 
+  swagger_path :create do
+    post("/todos")
+    summary("Create a new todo")
+    description("Add a new todo item to the list")
+    consumes(["application/json"])
+    produces(["application/json"])
+    tag("Todos")
+
+    parameters do
+      todo(:body, Schema.ref(:Todo), "Todo object to create", required: true)
+    end
+
+    response(201, "Created", Schema.ref(:Todo))
+    response(422, "Unprocessable Entity")
+  end
+
   swagger_path :show do
     get("/todos/:id")
     summary("Show a specific todo")
