@@ -4,6 +4,7 @@ defmodule SleekFlowTodo.Todos.Validations.StatusValidator do
   """
 
   def validate_status_optional(%{status: nil}), do: :ok
+
   def validate_status_optional(%{status: status}) do
     if status in [:not_started, :in_progress, :completed] do
       :ok

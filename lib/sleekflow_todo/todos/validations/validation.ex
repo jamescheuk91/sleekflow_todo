@@ -12,7 +12,8 @@ defmodule SleekFlowTodo.Todos.Validations.Validation do
   Returns `{:error, {field, message}}` for the first validation error.
   Returns `{:error, [{field, message}, ...]}` if multiple validators fail.
   """
-  @spec run_validators(map(), [validator()]) :: :ok | {:error, {atom(), String.t()} | [{atom(), String.t()}]}
+  @spec run_validators(map(), [validator()]) ::
+          :ok | {:error, {atom(), String.t()} | [{atom(), String.t()}]}
   def run_validators(params, validators) do
     errors =
       Enum.reduce(validators, [], fn validator, acc ->

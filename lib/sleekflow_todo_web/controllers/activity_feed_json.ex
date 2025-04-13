@@ -23,7 +23,8 @@ defmodule SleekFlowTodoWeb.ActivityFeedJSON do
       id: item.id,
       todo_id: item.todo_id,
       type: item.type,
-      details: item.details, # Details is already a map
+      # Details is already a map
+      details: item.details,
       occurred_at: item.occurred_at,
       inserted_at: item.inserted_at
     }

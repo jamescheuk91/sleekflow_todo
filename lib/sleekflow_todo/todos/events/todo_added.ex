@@ -66,10 +66,12 @@ defimpl Commanded.Serialization.JsonDecoder, for: SleekFlowTodo.Todos.Events.Tod
         try do
           String.to_existing_atom(status)
         rescue
-          ArgumentError -> status # Keep original if not an existing atom
+          # Keep original if not an existing atom
+          ArgumentError -> status
         end
       else
-        status # Keep original if not a string
+        # Keep original if not a string
+        status
       end
 
     parsed_priority =
@@ -78,14 +80,17 @@ defimpl Commanded.Serialization.JsonDecoder, for: SleekFlowTodo.Todos.Events.Tod
           try do
             String.to_existing_atom(priority)
           rescue
-            ArgumentError -> priority # Keep original if not an existing atom
+            # Keep original if not an existing atom
+            ArgumentError -> priority
           end
 
         is_nil(priority) ->
-          nil # Keep nil
+          # Keep nil
+          nil
 
         true ->
-          priority # Keep original otherwise
+          # Keep original otherwise
+          priority
       end
 
     # Return event with potentially updated fields

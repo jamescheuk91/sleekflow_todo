@@ -2,15 +2,24 @@ defmodule SleekFlowTodoWeb.ActivityFeedControllerTest do
   use SleekFlowTodoWeb.ConnCase, async: false
 
   # Use the factory alias if defined, otherwise ExMachina functions directly
-  import SleekFlowTodo.Factory # Or your specific factory module alias
+  # Or your specific factory module alias
+  import SleekFlowTodo.Factory
   # Remove unused alias: alias SleekFlowTodo.Activities.ActivityFeedItem
-
 
   describe "index/2" do
     test "lists all activity feed items", %{conn: conn} do
       # Use the factory to insert test data
-      item1 = insert(:activity_feed_item_read_model, %{type: "todo_added", details: %{name: "Test Todo 1"}})
-      item2 = insert(:activity_feed_item_read_model, %{type: "todo_edited", details: %{name: "Updated Test Todo 2", status: "in_progress"}})
+      item1 =
+        insert(:activity_feed_item_read_model, %{
+          type: "todo_added",
+          details: %{name: "Test Todo 1"}
+        })
+
+      item2 =
+        insert(:activity_feed_item_read_model, %{
+          type: "todo_edited",
+          details: %{name: "Updated Test Todo 2", status: "in_progress"}
+        })
 
       conn = get(conn, ~p"/api/activities")
 
@@ -27,7 +36,8 @@ defmodule SleekFlowTodoWeb.ActivityFeedControllerTest do
       assert first_item_resp["type"] == "todo_added"
       assert first_item_resp["details"]["name"] == "Test Todo 1"
       assert is_binary(first_item_resp["occurred_at"])
-      assert is_binary(first_item_resp["inserted_at"]) # Check inserted_at as well
+      # Check inserted_at as well
+      assert is_binary(first_item_resp["inserted_at"])
     end
 
     test "returns empty list when no activities exist", %{conn: conn} do

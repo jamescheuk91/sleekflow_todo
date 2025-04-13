@@ -14,7 +14,16 @@ defmodule SleekFlowTodo.Todos.Aggregates.TodoTest do
 
     assert %TodoAdded{} =
              event =
-             Todo.add(%Todo{}, todo_id, "Buy milk", "Buy milk description", next_day, priority, tags, now)
+             Todo.add(
+               %Todo{},
+               todo_id,
+               "Buy milk",
+               "Buy milk description",
+               next_day,
+               priority,
+               tags,
+               now
+             )
 
     assert event.todo_id == todo_id
     assert event.name == "Buy milk"

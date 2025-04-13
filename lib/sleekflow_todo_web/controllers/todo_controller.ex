@@ -72,7 +72,11 @@ defmodule SleekFlowTodoWeb.TodoController do
     tag("Todos")
 
     parameters do
-      id(:path, :string, "Todo ID", required: true, example: "02ef07e0-eb4f-4fca-b6aa-c7993427cc10")
+      id(:path, :string, "Todo ID",
+        required: true,
+        example: "02ef07e0-eb4f-4fca-b6aa-c7993427cc10"
+      )
+
       todo(:body, Schema.ref(:Todo), "Todo object with updated details", required: true)
     end
 
@@ -88,12 +92,15 @@ defmodule SleekFlowTodoWeb.TodoController do
     tag("Todos")
 
     parameters do
-      id(:path, :string, "Todo ID", required: true, example: "02ef07e0-eb4f-4fca-b6aa-c7993427cc10")
+      id(:path, :string, "Todo ID",
+        required: true,
+        example: "02ef07e0-eb4f-4fca-b6aa-c7993427cc10"
+      )
     end
 
     response(204, "No Content")
     response(404, "Not Found")
-   end
+  end
 
   def swagger_definitions do
     %{

@@ -6,7 +6,7 @@ defmodule SleekFlowTodo.Activities.GetActivityFeedService do
   import Ecto.Query, warn: false
 
   alias SleekFlowTodo.ProjectionRepo
-    alias SleekFlowTodo.Activities.ActivityFeedItemReadModel
+  alias SleekFlowTodo.Activities.ActivityFeedItemReadModel
 
   @doc """
   Retrieves a list of activity feed items, ordered by occurrence time (newest first).

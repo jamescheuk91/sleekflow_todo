@@ -23,7 +23,9 @@ defmodule SleekFlowTodoWeb.Router do
   end
 
   scope "/api/swagger" do
-    forward "/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :sleekflow_todo, swagger_file: "swagger.json"
+    forward "/", PhoenixSwagger.Plug.SwaggerUI,
+      otp_app: :sleekflow_todo,
+      swagger_file: "swagger.json"
   end
 
   # Add swagger_info function

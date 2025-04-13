@@ -7,7 +7,15 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandler do
 
   alias SleekFlowTodo.Todos.Commands.AddTodo
   alias SleekFlowTodo.Todos.Aggregates.Todo
-  alias SleekFlowTodo.Todos.Validations.{Validation, NameValidator, DescriptionValidator, DueDateValidator, TagsValidator, PriorityValidator}
+
+  alias SleekFlowTodo.Todos.Validations.{
+    Validation,
+    NameValidator,
+    DescriptionValidator,
+    DueDateValidator,
+    TagsValidator,
+    PriorityValidator
+  }
 
   def handle(aggregate, command) do
     Logger.debug("[AddTodoHandler] Received aggregate: #{inspect(aggregate)}")
@@ -33,7 +41,9 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandler do
           added_at: added_at
         } = command
 
-        result = Todo.add(aggregate, todo_id, name, description, due_date, priority, tags, added_at)
+        result =
+          Todo.add(aggregate, todo_id, name, description, due_date, priority, tags, added_at)
+
         {:ok, result}
 
       {:error, error_details} ->

@@ -5,7 +5,8 @@ defmodule SleekFlowTodo.ProjectionRepo.Migrations.CreateActivityFeedItemsTable d
     create table(:activity_feed_items, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :todo_id, :binary_id, null: false
-      add :type, :string, null: false # Storing enum as string for flexibility
+      # Storing enum as string for flexibility
+      add :type, :string, null: false
       add :details, :map, null: false
       add :occurred_at, :utc_datetime_usec, null: false
 

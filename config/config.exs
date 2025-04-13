@@ -34,7 +34,6 @@ config :sleekflow_todo, SleekFlowTodoWeb.Endpoint,
   pubsub_server: SleekFlowTodo.PubSub,
   live_view: [signing_salt: "hrxgmn/U"]
 
-
 config :phoenix_swagger, json_library: Jason
 
 # Configure phoenix_swagger

@@ -36,22 +36,24 @@ defmodule SleekFlowTodo.Activities.GetActivityFeedServiceTest do
       item2: item2,
       item3: item3
     } do
-      result_ids = GetActivityFeedService.list_activity_feed() |> Enum.map(&(&1.id))
+      result_ids = GetActivityFeedService.list_activity_feed() |> Enum.map(& &1.id)
       assert result_ids == [item2.id, item3.id, item1.id]
     end
 
     test "limits the number of returned items", %{item2: item2, item3: item3} do
-      result_ids = GetActivityFeedService.list_activity_feed(limit: 2) |> Enum.map(&(&1.id))
+      result_ids = GetActivityFeedService.list_activity_feed(limit: 2) |> Enum.map(& &1.id)
       assert result_ids == [item2.id, item3.id]
     end
 
     test "offsets the returned items", %{item3: item3, item1: item1} do
-      result_ids = GetActivityFeedService.list_activity_feed(offset: 1) |> Enum.map(&(&1.id))
+      result_ids = GetActivityFeedService.list_activity_feed(offset: 1) |> Enum.map(& &1.id)
       assert result_ids == [item3.id, item1.id]
     end
 
     test "applies both limit and offset", %{item3: item3} do
-      result_ids = GetActivityFeedService.list_activity_feed(limit: 1, offset: 1) |> Enum.map(&(&1.id))
+      result_ids =
+        GetActivityFeedService.list_activity_feed(limit: 1, offset: 1) |> Enum.map(& &1.id)
+
       assert result_ids == [item3.id]
     end
 

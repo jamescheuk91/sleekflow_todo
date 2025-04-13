@@ -10,15 +10,16 @@ defmodule SleekFlowTodoWeb.ActivityFeedController do
   action_fallback SleekFlowTodoWeb.FallbackController
 
   swagger_path :index do
-    get "/activities"
-    summary "List Activity Feed Items"
-    description "Returns a list of recent activities related to TODOs."
-    produces "application/json"
-    tag "Activities"
+    get("/activities")
+    summary("List Activity Feed Items")
+    description("Returns a list of recent activities related to TODOs.")
+    produces("application/json")
+    tag("Activities")
     # Add parameters for pagination if needed later
     # parameter :query, :integer, :limit, "Limit the number of items returned", default: 50
     # parameter :query, :integer, :offset, "Offset for pagination", default: 0
-    response 200, "OK", Schema.ref(:ActivityFeed) # Reference the list schema
+    # Reference the list schema
+    response(200, "OK", Schema.ref(:ActivityFeed))
   end
 
   def swagger_definitions do
@@ -27,6 +28,7 @@ defmodule SleekFlowTodoWeb.ActivityFeedController do
         swagger_schema do
           title("Activity Feed Item")
           description("An entry in the activity feed")
+
           properties do
             id(:string, "Unique identifier for the feed item", format: "uuid")
             todo_id(:string, "Identifier of the related TODO item", format: "uuid")
@@ -35,6 +37,7 @@ defmodule SleekFlowTodoWeb.ActivityFeedController do
             occurred_at(:string, "Timestamp when the activity occurred", format: "date-time")
             inserted_at(:string, "Timestamp when the feed item was recorded", format: "date-time")
           end
+
           example(%{
             id: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
             todo_id: "02ef07e0-eb4f-4fca-b6aa-c7993427cc10",
@@ -62,6 +65,7 @@ defmodule SleekFlowTodoWeb.ActivityFeedController do
     ]
 
     feed_items = Activities.list_activity_feed(opts)
+
     conn
     |> put_view(json: ActivityFeedJSON)
     |> render(:index, items: feed_items)

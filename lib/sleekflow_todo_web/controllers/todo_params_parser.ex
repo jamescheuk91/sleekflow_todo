@@ -11,7 +11,8 @@ defmodule SleekFlowTodoWeb.TodoParamsParser do
     |> SleekFlowTodo.Utils.key_to_atom()
     |> parse_due_date()
     |> parse_priority()
-    |> wrap_ok() # Assuming parsing functions now might return error tuples or log errors
+    # Assuming parsing functions now might return error tuples or log errors
+    |> wrap_ok()
   end
 
   @doc """
@@ -25,7 +26,8 @@ defmodule SleekFlowTodoWeb.TodoParamsParser do
     |> parse_due_date()
     |> parse_priority()
     |> parse_status()
-    |> wrap_ok() # Assuming parsing functions now might return error tuples or log errors
+    # Assuming parsing functions now might return error tuples or log errors
+    |> wrap_ok()
   end
 
   @doc """
@@ -42,7 +44,9 @@ defmodule SleekFlowTodoWeb.TodoParamsParser do
 
         status_string when is_binary(status_string) ->
           case String.to_existing_atom(status_string) do
-            atom when is_atom(atom) -> Map.put(filters, :status, atom)
+            atom when is_atom(atom) ->
+              Map.put(filters, :status, atom)
+
             # Ignore invalid status strings for filtering
             _ ->
               Logger.debug("Ignoring invalid status filter: #{inspect(status_string)}")
@@ -102,11 +106,13 @@ defmodule SleekFlowTodoWeb.TodoParamsParser do
 
   defp parse_due_date(params) do
     key = :due_date
+
     case Map.fetch(params, key) do
       {:ok, date_string} when is_binary(date_string) ->
         case DateTime.from_iso8601(date_string) do
           {:ok, datetime, _offset} ->
             Map.put(params, key, datetime)
+
           {:error, reason} ->
             # Log error, but keep original value for context validation later
             Logger.error("Failed to parse due_date '#{date_string}': #{inspect(reason)}")
@@ -114,6 +120,7 @@ defmodule SleekFlowTodoWeb.TodoParamsParser do
             # Or potentially return an error tuple here if immediate failure is desired
             # {:error, {:invalid_format, key, date_string}}
         end
+
       # Ignore if key doesn't exist or value is not a string
       _ ->
         params
@@ -122,15 +129,20 @@ defmodule SleekFlowTodoWeb.TodoParamsParser do
 
   defp parse_status(params) do
     key = :status
+
     case Map.fetch(params, key) do
       {:ok, status_string} when is_binary(status_string) ->
         case safe_string_to_existing_atom(status_string) do
-          {:ok, atom} -> Map.put(params, key, atom)
+          {:ok, atom} ->
+            Map.put(params, key, atom)
+
           {:error, _} ->
             Logger.error("Invalid status string received: #{inspect(status_string)}")
-            params # Keep original value for context validation
+            # Keep original value for context validation
+            params
             # {:error, {:invalid_value, key, status_string}}
         end
+
       _ ->
         params
     end
@@ -138,15 +150,20 @@ defmodule SleekFlowTodoWeb.TodoParamsParser do
 
   defp parse_priority(params) do
     key = :priority
+
     case Map.fetch(params, key) do
       {:ok, priority_string} when is_binary(priority_string) ->
         case safe_string_to_existing_atom(priority_string) do
-          {:ok, atom} -> Map.put(params, key, atom)
+          {:ok, atom} ->
+            Map.put(params, key, atom)
+
           {:error, _} ->
             Logger.error("Invalid priority string received: #{inspect(priority_string)}")
-            params # Keep original value for context validation
+            # Keep original value for context validation
+            params
             # {:error, {:invalid_value, key, priority_string}}
         end
+
       _ ->
         params
     end

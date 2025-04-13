@@ -257,13 +257,17 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandlerTest do
     test "returns multiple errors including invalid priority" do
       command = %EditTodo{
         todo_id: @valid_todo_id,
-        name: "N", # Invalid
-        priority: :invalid # Invalid
+        # Invalid
+        name: "N",
+        # Invalid
+        priority: :invalid
       }
+
       expected_errors = [
         {:name, "Name must be at least 2 characters"},
         {:priority, "Priority must be one of: [:low, :medium, :high]"}
       ]
+
       assert {:error, errors} = EditTodoHandler.handle(@initial_aggregate_state, command)
       assert errors == expected_errors
     end

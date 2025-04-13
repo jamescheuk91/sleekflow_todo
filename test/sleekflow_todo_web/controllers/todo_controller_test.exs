@@ -43,7 +43,8 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
       todo_c_id =
         create_todo_and_wait(%{
           name: "Cherry",
-          due_date: due_date_today_future, # Use the slightly future date
+          # Use the slightly future date
+          due_date: due_date_today_future,
           priority: :high
         })
 
@@ -69,7 +70,8 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
     test "renders all todo items without filters", %{conn: conn, todo_ids: ids} do
       conn = get(conn, ~p"/api/todos")
       response = json_response(conn, 200)["data"]
-      assert length(response) == 3 # Updated count
+      # Updated count
+      assert length(response) == 3
 
       response_ids = Enum.map(response, & &1["id"])
       assert ids.a in response_ids
@@ -134,7 +136,8 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
       # Expecting it to ignore the invalid date and return all 3 todos
       conn = get(conn, ~p"/api/todos?due_date=invalid-date-format")
       response = json_response(conn, 200)["data"]
-      assert length(response) == 3 # Updated count
+      # Updated count
+      assert length(response) == 3
     end
 
     # --- Sorting Tests ---
@@ -297,7 +300,6 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
     end
 
     test "renders the specific todo item with all attribtutes", %{conn: conn} do
-
       due_date = DateTime.utc_now() |> DateTime.add(1, :day)
       due_date_string = due_date |> DateTime.to_iso8601()
 

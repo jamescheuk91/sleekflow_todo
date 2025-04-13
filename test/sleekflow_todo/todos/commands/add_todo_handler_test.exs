@@ -306,6 +306,7 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandlerTest do
       priority: :low,
       added_at: DateTime.utc_now()
     }
+
     assert {:ok, %TodoAdded{priority: :low}} = AddTodoHandler.handle(%Todo{}, command)
   end
 
@@ -316,6 +317,7 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandlerTest do
       priority: :medium,
       added_at: DateTime.utc_now()
     }
+
     assert {:ok, %TodoAdded{priority: :medium}} = AddTodoHandler.handle(%Todo{}, command)
   end
 
@@ -326,6 +328,7 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandlerTest do
       priority: :high,
       added_at: DateTime.utc_now()
     }
+
     assert {:ok, %TodoAdded{priority: :high}} = AddTodoHandler.handle(%Todo{}, command)
   end
 
@@ -336,6 +339,7 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandlerTest do
       priority: nil,
       added_at: DateTime.utc_now()
     }
+
     assert {:ok, %TodoAdded{priority: nil}} = AddTodoHandler.handle(%Todo{}, command)
   end
 
@@ -343,9 +347,11 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandlerTest do
     command = %AddTodo{
       todo_id: Commanded.UUID.uuid4(),
       name: "Test Invalid Priority",
-      priority: :critical, # Invalid atom
+      # Invalid atom
+      priority: :critical,
       added_at: DateTime.utc_now()
     }
+
     expected_error = {:error, {:priority, "Priority must be one of: [:low, :medium, :high]"}}
     assert expected_error == AddTodoHandler.handle(%Todo{}, command)
   end
@@ -354,9 +360,11 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandlerTest do
     command = %AddTodo{
       todo_id: Commanded.UUID.uuid4(),
       name: "Test Invalid Priority Type",
-      priority: "high", # Invalid type (string)
+      # Invalid type (string)
+      priority: "high",
       added_at: DateTime.utc_now()
     }
+
     expected_error = {:error, {:priority, "Priority must be one of: [:low, :medium, :high]"}}
     assert expected_error == AddTodoHandler.handle(%Todo{}, command)
   end

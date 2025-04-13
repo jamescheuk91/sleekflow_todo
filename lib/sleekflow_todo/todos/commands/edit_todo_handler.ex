@@ -7,7 +7,16 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandler do
 
   alias SleekFlowTodo.Todos.Commands.EditTodo
   alias SleekFlowTodo.Todos.Aggregates.Todo
-  alias SleekFlowTodo.Todos.Validations.{Validation, NameValidator, DescriptionValidator, DueDateValidator, StatusValidator, TagsValidator, PriorityValidator}
+
+  alias SleekFlowTodo.Todos.Validations.{
+    Validation,
+    NameValidator,
+    DescriptionValidator,
+    DueDateValidator,
+    StatusValidator,
+    TagsValidator,
+    PriorityValidator
+  }
 
   def handle(aggregate, command) do
     Logger.debug("[EditTodoHandler] Received aggregate: #{inspect(aggregate)}")
@@ -34,7 +43,9 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandler do
           tags: tags
         } = command
 
-        result = Todo.edit(aggregate, todo_id, name, description, due_date, status, priority, tags)
+        result =
+          Todo.edit(aggregate, todo_id, name, description, due_date, status, priority, tags)
+
         {:ok, result}
 
       {:error, error_details} ->

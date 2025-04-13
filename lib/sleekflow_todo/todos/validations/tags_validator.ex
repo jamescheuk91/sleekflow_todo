@@ -11,8 +11,10 @@ defmodule SleekFlowTodo.Todos.Validations.TagsValidator do
     cond do
       is_list(tags) and Enum.all?(tags, &is_binary/1) ->
         :ok
+
       is_list(tags) ->
         {:error, {:tags, "All tags must be strings"}}
+
       true ->
         {:error, {:tags, "Tags must be a list of strings"}}
     end

@@ -8,6 +8,7 @@ defmodule SleekFlowTodo.Todos.Validations.PriorityValidator do
 
   defp validate_priority_format(priority) do
     allowed_priorities = [:low, :medium, :high]
+
     if Enum.member?(allowed_priorities, priority) do
       :ok
     else

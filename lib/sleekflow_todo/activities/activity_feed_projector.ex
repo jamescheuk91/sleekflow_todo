@@ -31,7 +31,10 @@ defmodule SleekFlowTodo.Activities.ActivityFeedProjector do
 
   project(%TodoEdited{} = event, metadata, fn multi ->
     # Filter out nil values from the event to only store actual changes
-    changes = Map.from_struct(event) |> Enum.reject(fn {k, v} -> k == :todo_id or is_nil(v) end) |> Map.new()
+    changes =
+      Map.from_struct(event)
+      |> Enum.reject(fn {k, v} -> k == :todo_id or is_nil(v) end)
+      |> Map.new()
 
     # Only record the feed item if there were actual changes other than todo_id
     if map_size(changes) > 0 do
@@ -48,7 +51,10 @@ defmodule SleekFlowTodo.Activities.ActivityFeedProjector do
 
       Ecto.Multi.insert(multi, :insert_activity_feed_item, struct)
     else
-      Logger.info("Skipping ActivityFeedItem for TodoEdited event with no changes: #{inspect(event)}")
+      Logger.info(
+        "Skipping ActivityFeedItem for TodoEdited event with no changes: #{inspect(event)}"
+      )
+
       multi
     end
   end)
