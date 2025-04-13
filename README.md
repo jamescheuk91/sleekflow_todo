@@ -25,12 +25,10 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Source: https://github.com/phoenixframework/phoenix
 
 
-
-To initialize the event store:
-
-```bash
-bin/sleekflow_todo eval "SleekFlowTodo.Release.init_event_store()"
-```
+## generate the documentation
+"""
+mix docs
+"""
 
 ## SSH Into Remote Console
 """

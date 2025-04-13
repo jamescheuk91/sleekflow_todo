@@ -64,7 +64,9 @@ defmodule SleekFlowTodo.MixProject do
       {:eventstore, "~> 1.4.8"},
       {:commanded, "~> 1.4.3"},
       {:commanded_eventstore_adapter, "~> 1.4.1"},
-      {:commanded_ecto_projections, "~> 1.4.0"}
+      {:commanded_ecto_projections, "~> 1.4.0"},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:earmark, "~> 1.4"}
     ]
   end
 
