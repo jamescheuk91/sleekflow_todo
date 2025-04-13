@@ -21,6 +21,26 @@ defmodule SleekFlowTodoWeb.Router do
     resources "/todos", TodoController, only: [:index, :create, :show, :update, :delete]
   end
 
+  scope "/api/swagger" do
+    forward "/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :sleekflow_todo, swagger_file: "swagger.json"
+  end
+
+  # Add swagger_info function
+  def swagger_info do
+    %{
+      basePath: "/api",
+      info: %{
+        version: "1.0.0",
+        title: "SleekFlow Todo API"
+      },
+      consumes: ["application/json"],
+      produces: ["application/json"],
+      tags: [
+        %{name: "Todos", description: "Operations related to Todos"}
+      ]
+    }
+  end
+
   # Enable LiveDashboard in development
   if Application.compile_env(:sleekflow_todo, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put

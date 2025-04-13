@@ -1,0 +1,23 @@
+{
+  "info": {
+    "version": "1.0.0",
+    "title": "SleekFlow Todo API"
+  },
+  "host": "localhost:4000",
+  "definitions": {},
+  "paths": {},
+  "swagger": "2.0",
+  "basePath": "/api",
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "tags": [
+    {
+      "name": "Todos",
+      "description": "Operations related to Todos"
+    }
+  ]
+}

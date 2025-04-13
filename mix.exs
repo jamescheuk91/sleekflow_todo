@@ -7,6 +7,7 @@ defmodule SleekFlowTodo.MixProject do
       version: "0.1.0",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
+      compilers: Mix.compilers() ++ [:phoenix_swagger],
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
@@ -66,7 +67,9 @@ defmodule SleekFlowTodo.MixProject do
       {:commanded_eventstore_adapter, "~> 1.4.1"},
       {:commanded_ecto_projections, "~> 1.4.0"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:earmark, "~> 1.4"}
+      {:earmark, "~> 1.4"},
+      {:phoenix_swagger, "~> 0.8.3"},
+      {:ex_json_schema, "~> 0.5"}
     ]
   end
 

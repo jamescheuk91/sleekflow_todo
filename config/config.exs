@@ -28,11 +28,23 @@ config :sleekflow_todo, SleekFlowTodoWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [html: SleekFlowTodoWeb.ErrorHTML, json: SleekFlowTodoWeb.ErrorJSON],
+    formats: [json: SleekFlowTodoWeb.ErrorJSON],
     layout: false
   ],
   pubsub_server: SleekFlowTodo.PubSub,
   live_view: [signing_salt: "hrxgmn/U"]
+
+
+config :phoenix_swagger, json_library: Jason
+
+# Configure phoenix_swagger
+config :sleekflow_todo, :phoenix_swagger,
+  swagger_files: %{
+    "priv/static/swagger.json" => [
+      router: SleekFlowTodoWeb.Router,
+      endpoint: SleekFlowTodoWeb.Endpoint
+    ]
+  }
 
 # Configures the mailer
 #
