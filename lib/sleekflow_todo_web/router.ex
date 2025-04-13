@@ -14,12 +14,6 @@ defmodule SleekFlowTodoWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", SleekFlowTodoWeb do
-    pipe_through :browser
-
-    get "/", PageController, :home
-  end
-
   # Other scopes may use custom stacks.
   scope "/api", SleekFlowTodoWeb do
     pipe_through :api
