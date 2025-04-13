@@ -26,6 +26,47 @@ defmodule SleekFlowTodoWeb.TodoController do
     end
   end
 
+  def swagger_definitions do
+    %{
+      Todo: swagger_schema do
+        title "Todo"
+        description "A todo item"
+        properties do
+          id :string, "Unique identifier", required: true
+          name :string, "todo item name", required: true
+          status :string, "todo item status", required: true
+          due_date :string, "todo item due date", required: false
+          priority :string, "todo item priority", required: false
+          description :string, "todo item description", required: false
+          tags :array, "todo item tags", required: false
+          updated_at :string, "todo item updated at", required: false
+          added_at :string, "todo item added at", required: false
+
+        end
+        example %{
+          id: "02ef07e0-eb4f-4fca-b6aa-c7993427cc10",
+          name: "test new",
+          priority: "high",
+          status: "in_progress",
+          description: "description new",
+          tags: [
+              "test1",
+            "test3"
+          ],
+          updated_at: "2025-04-13T07:05:25.345643Z",
+          due_date: "2025-04-14T15:28:42.596658Z",
+          added_at: "2025-04-09T11:25:30.867826Z"
+        }
+      end,
+      Todos: swagger_schema do
+        title "Todos"
+        description "A collection of Todos"
+        type :array
+        items Schema.ref(:Todo)
+      end
+    }
+  end
+
   def index(conn, params) do
     filters = TodoParamsParser.parse_index_filters(params)
     sort = TodoParamsParser.parse_index_sort(params)

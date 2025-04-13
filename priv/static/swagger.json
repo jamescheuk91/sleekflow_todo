@@ -4,7 +4,78 @@
     "title": "SleekFlow Todo API"
   },
   "host": "localhost:4000",
-  "definitions": {},
+  "definitions": {
+    "Todo": {
+      "description": "A todo item",
+      "example": {
+        "added_at": "2025-04-09T11:25:30.867826Z",
+        "description": "description new",
+        "due_date": "2025-04-14T15:28:42.596658Z",
+        "id": "02ef07e0-eb4f-4fca-b6aa-c7993427cc10",
+        "name": "test new",
+        "priority": "high",
+        "status": "in_progress",
+        "tags": [
+          "test1",
+          "test3"
+        ],
+        "updated_at": "2025-04-13T07:05:25.345643Z"
+      },
+      "properties": {
+        "added_at": {
+          "description": "todo item added at",
+          "type": "string"
+        },
+        "description": {
+          "description": "todo item description",
+          "type": "string"
+        },
+        "due_date": {
+          "description": "todo item due date",
+          "type": "string"
+        },
+        "id": {
+          "description": "Unique identifier",
+          "type": "string"
+        },
+        "name": {
+          "description": "todo item name",
+          "type": "string"
+        },
+        "priority": {
+          "description": "todo item priority",
+          "type": "string"
+        },
+        "status": {
+          "description": "todo item status",
+          "type": "string"
+        },
+        "tags": {
+          "description": "todo item tags",
+          "type": "array"
+        },
+        "updated_at": {
+          "description": "todo item updated at",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "name",
+        "id"
+      ],
+      "title": "Todo",
+      "type": "object"
+    },
+    "Todos": {
+      "description": "A collection of Todos",
+      "items": {
+        "$ref": "#/definitions/Todo"
+      },
+      "title": "Todos",
+      "type": "array"
+    }
+  },
   "paths": {
     "/todos": {
       "get": {
