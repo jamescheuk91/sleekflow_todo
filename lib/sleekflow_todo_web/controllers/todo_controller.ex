@@ -15,10 +15,14 @@ defmodule SleekFlowTodoWeb.TodoController do
     description("Retrieve a list of all todos")
     produces(["application/json"])
     tag("Todos")
+
     parameters do
       status(:query, :array, "Status filter",
-      items: [type: :string, enum: [:not_started, :in_progress, :completed]])
+        items: [type: :string, enum: [:not_started, :in_progress, :completed]]
+      )
       due_date(:query, :string, "DateTime in ISO8601", example: "2025-04-15T15:25:11.550132Z")
+      sort_by(:query, :string, "Sort by", example: "priority")
+      sort_order(:query, :string, "Sort order", example: "asc")
     end
   end
 

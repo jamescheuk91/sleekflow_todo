@@ -33,6 +33,22 @@
             "required": false,
             "type": "string",
             "x-example": "2025-04-15T15:25:11.550132Z"
+          },
+          {
+            "description": "Sort by",
+            "in": "query",
+            "name": "sort_by",
+            "required": false,
+            "type": "string",
+            "x-example": "priority"
+          },
+          {
+            "description": "Sort order",
+            "in": "query",
+            "name": "sort_order",
+            "required": false,
+            "type": "string",
+            "x-example": "asc"
           }
         ],
         "produces": [
