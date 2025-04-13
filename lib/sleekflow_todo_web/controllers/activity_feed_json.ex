@@ -1,6 +1,6 @@
 # lib/sleekflow_todo_web/controllers/activity_feed_json.ex
 defmodule SleekFlowTodoWeb.ActivityFeedJSON do
-  alias SleekFlowTodo.Activities.ActivityFeedItem
+  alias SleekFlowTodo.Activities.ActivityFeedItemReadModel
 
   @doc """
   Renders a list of activity feed items.
@@ -18,7 +18,7 @@ defmodule SleekFlowTodoWeb.ActivityFeedJSON do
     %{data: data(item)}
   end
 
-  defp data(%ActivityFeedItem{} = item) do
+  defp data(%ActivityFeedItemReadModel{} = item) do
     %{
       id: item.id,
       todo_id: item.todo_id,
