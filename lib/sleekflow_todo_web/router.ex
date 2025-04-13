@@ -19,6 +19,7 @@ defmodule SleekFlowTodoWeb.Router do
     pipe_through :api
 
     resources "/todos", TodoController, only: [:index, :create, :show, :update, :delete]
+    get "/activities", ActivityFeedController, :index
   end
 
   scope "/api/swagger" do
@@ -36,7 +37,8 @@ defmodule SleekFlowTodoWeb.Router do
       consumes: ["application/json"],
       produces: ["application/json"],
       tags: [
-        %{name: "Todos", description: "Operations related to Todos"}
+        %{name: "Todos", description: "Operations related to Todos"},
+        %{name: "Activities", description: "Operations related to Activity Feed"}
       ]
     }
   end

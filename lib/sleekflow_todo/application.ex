@@ -13,6 +13,7 @@ defmodule SleekFlowTodo.Application do
       SleekFlowTodo.ProjectionRepo,
       SleekFlowTodo.CommandedApplication,
       SleekFlowTodo.Todos.TodoReadModelProjector,
+      SleekFlowTodo.Activities.ActivityFeedProjector,
       {Phoenix.PubSub, name: SleekFlowTodo.PubSub},
       # Start Finch
       {Finch, name: SleekFlowTodo.Finch},

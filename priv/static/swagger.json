@@ -74,9 +74,85 @@
       },
       "title": "Todos",
       "type": "array"
+    },
+    "ActivityFeedItem": {
+      "description": "An entry in the activity feed",
+      "example": {
+        "details": {
+          "name": "Updated Task Name",
+          "status": "in_progress"
+        },
+        "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+        "inserted_at": "2025-04-13T10:00:00.123456Z",
+        "occurred_at": "2025-04-13T10:00:00.123456Z",
+        "todo_id": "02ef07e0-eb4f-4fca-b6aa-c7993427cc10",
+        "type": "todo_edited"
+      },
+      "properties": {
+        "details": {
+          "description": "Details of the activity event",
+          "type": "map"
+        },
+        "id": {
+          "description": "Unique identifier for the feed item",
+          "format": "uuid",
+          "type": "string"
+        },
+        "inserted_at": {
+          "description": "Timestamp when the feed item was recorded",
+          "format": "date-time",
+          "type": "string"
+        },
+        "occurred_at": {
+          "description": "Timestamp when the activity occurred",
+          "format": "date-time",
+          "type": "string"
+        },
+        "todo_id": {
+          "description": "Identifier of the related TODO item",
+          "format": "uuid",
+          "type": "string"
+        },
+        "type": {
+          "description": "Type of activity (e.g., todo_added, todo_edited)",
+          "type": "string"
+        }
+      },
+      "title": "Activity Feed Item",
+      "type": "object"
+    },
+    "ActivityFeed": {
+      "description": "A list of activity feed items",
+      "items": {
+        "$ref": "#/definitions/ActivityFeedItem"
+      },
+      "title": "Activity Feed",
+      "type": "array"
     }
   },
   "paths": {
+    "/activities": {
+      "get": {
+        "description": "Returns a list of recent activities related to TODOs.",
+        "operationId": "SleekFlowTodoWeb.ActivityFeedController.index",
+        "parameters": [],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ActivityFeed"
+            }
+          }
+        },
+        "summary": "List Activity Feed Items",
+        "tags": [
+          "Activities"
+        ]
+      }
+    },
     "/todos": {
       "get": {
         "description": "Retrieve a list of all todos",
@@ -304,6 +380,10 @@
     {
       "name": "Todos",
       "description": "Operations related to Todos"
+    },
+    {
+      "name": "Activities",
+      "description": "Operations related to Activity Feed"
     }
   ]
 }
