@@ -5,68 +5,6 @@
   },
   "host": "localhost:4000",
   "definitions": {
-    "ActivityFeed": {
-      "description": "A list of activity feed items",
-      "items": {
-        "$ref": "#/definitions/ActivityFeedItem"
-      },
-      "title": "Activity Feed",
-      "type": "array"
-    },
-    "ActivityFeedItem": {
-      "description": "An entry in the activity feed",
-      "example": {
-        "details": {
-          "name": "Updated Task Name",
-          "status": "in_progress"
-        },
-        "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-        "inserted_at": "2025-04-13T10:00:00.123456Z",
-        "occurred_at": "2025-04-13T10:00:00.123456Z",
-        "todo_id": "02ef07e0-eb4f-4fca-b6aa-c7993427cc10",
-        "type": "todo_edited"
-      },
-      "properties": {
-        "details": {
-          "description": "Details of the activity event",
-          "type": "map"
-        },
-        "id": {
-          "description": "Unique identifier for the feed item",
-          "format": "uuid",
-          "type": "string"
-        },
-        "inserted_at": {
-          "description": "Timestamp when the feed item was recorded",
-          "format": "date-time",
-          "type": "string"
-        },
-        "occurred_at": {
-          "description": "Timestamp when the activity occurred",
-          "format": "date-time",
-          "type": "string"
-        },
-        "todo_id": {
-          "description": "Identifier of the related TODO item",
-          "format": "uuid",
-          "type": "string"
-        },
-        "type": {
-          "description": "Type of activity (e.g., todo_added, todo_edited)",
-          "type": "string"
-        }
-      },
-      "title": "Activity Feed Item",
-      "type": "object"
-    },
-    "Todos": {
-      "description": "A collection of Todos",
-      "items": {
-        "$ref": "#/definitions/Todo"
-      },
-      "title": "Todos",
-      "type": "array"
-    },
     "Todo": {
       "description": "A todo item",
       "example": {
@@ -128,18 +66,70 @@
       ],
       "title": "Todo",
       "type": "object"
+    },
+    "Todos": {
+      "description": "A collection of Todos",
+      "items": {
+        "$ref": "#/definitions/Todo"
+      },
+      "title": "Todos",
+      "type": "array"
+    },
+    "ActivityFeedItem": {
+      "description": "An entry in the activity feed",
+      "example": {
+        "details": {
+          "name": "Updated Task Name",
+          "status": "in_progress"
+        },
+        "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+        "inserted_at": "2025-04-13T10:00:00.123456Z",
+        "occurred_at": "2025-04-13T10:00:00.123456Z",
+        "todo_id": "02ef07e0-eb4f-4fca-b6aa-c7993427cc10",
+        "type": "todo_edited"
+      },
+      "properties": {
+        "details": {
+          "description": "Details of the activity event",
+          "type": "map"
+        },
+        "id": {
+          "description": "Unique identifier for the feed item",
+          "format": "uuid",
+          "type": "string"
+        },
+        "inserted_at": {
+          "description": "Timestamp when the feed item was recorded",
+          "format": "date-time",
+          "type": "string"
+        },
+        "occurred_at": {
+          "description": "Timestamp when the activity occurred",
+          "format": "date-time",
+          "type": "string"
+        },
+        "todo_id": {
+          "description": "Identifier of the related TODO item",
+          "format": "uuid",
+          "type": "string"
+        },
+        "type": {
+          "description": "Type of activity (e.g., todo_added, todo_edited)",
+          "type": "string"
+        }
+      },
+      "title": "Activity Feed Item",
+      "type": "object"
+    },
+    "ActivityFeed": {
+      "description": "A list of activity feed items",
+      "items": {
+        "$ref": "#/definitions/ActivityFeedItem"
+      },
+      "title": "Activity Feed",
+      "type": "array"
     }
   },
-  "tags": [
-    {
-      "name": "Todos",
-      "description": "Operations related to Todos"
-    },
-    {
-      "name": "Activities",
-      "description": "Operations related to Activity Feed"
-    }
-  ],
   "paths": {
     "/activities": {
       "get": {
@@ -378,12 +368,22 @@
       }
     }
   },
-  "produces": [
-    "application/json"
-  ],
+  "swagger": "2.0",
+  "basePath": "/api",
   "consumes": [
     "application/json"
   ],
-  "basePath": "/api",
-  "swagger": "2.0"
+  "produces": [
+    "application/json"
+  ],
+  "tags": [
+    {
+      "name": "Todos",
+      "description": "Operations related to Todos"
+    },
+    {
+      "name": "Activities",
+      "description": "Operations related to Activity Feed"
+    }
+  ]
 }
