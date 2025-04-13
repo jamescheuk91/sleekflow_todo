@@ -81,6 +81,20 @@ defmodule SleekFlowTodoWeb.TodoController do
     response(422, "Unprocessable Entity")
   end
 
+  swagger_path :delete do
+    PhoenixSwagger.Path.delete("/todos/:id")
+    summary("Delete a todo")
+    description("Remove a specific todo item by its ID")
+    tag("Todos")
+
+    parameters do
+      id(:path, :string, "Todo ID", required: true, example: "02ef07e0-eb4f-4fca-b6aa-c7993427cc10")
+    end
+
+    response(204, "No Content")
+    response(404, "Not Found")
+   end
+
   def swagger_definitions do
     %{
       Todo:

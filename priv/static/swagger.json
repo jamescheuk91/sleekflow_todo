@@ -179,6 +179,32 @@
       }
     },
     "/todos/:id": {
+      "delete": {
+        "description": "Remove a specific todo item by its ID",
+        "operationId": "SleekFlowTodoWeb.TodoController.delete",
+        "parameters": [
+          {
+            "description": "Todo ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "x-example": "02ef07e0-eb4f-4fca-b6aa-c7993427cc10"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "summary": "Delete a todo",
+        "tags": [
+          "Todos"
+        ]
+      },
       "get": {
         "description": "Retrieve a specific todo item by its ID",
         "operationId": "SleekFlowTodoWeb.TodoController.show",
