@@ -5,6 +5,14 @@
   },
   "host": "localhost:4000",
   "definitions": {
+    "Todos": {
+      "description": "A collection of Todos",
+      "items": {
+        "$ref": "#/definitions/Todo"
+      },
+      "title": "Todos",
+      "type": "array"
+    },
     "Todo": {
       "description": "A todo item",
       "example": {
@@ -66,14 +74,6 @@
       ],
       "title": "Todo",
       "type": "object"
-    },
-    "Todos": {
-      "description": "A collection of Todos",
-      "items": {
-        "$ref": "#/definitions/Todo"
-      },
-      "title": "Todos",
-      "type": "array"
     },
     "ActivityFeedItem": {
       "description": "An entry in the activity feed",
