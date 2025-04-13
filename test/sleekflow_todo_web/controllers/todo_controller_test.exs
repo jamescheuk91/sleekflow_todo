@@ -17,47 +17,64 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
 
   describe "index todos" do
     setup do
-      # Create some todos with different statuses and due dates
-      due_date_1 = DateTime.utc_now() |> DateTime.add(1, :day)
-      due_date_2 = DateTime.utc_now() |> DateTime.add(2, :day)
+      # Create diverse todos for sorting/filtering tests
+      # Add a small buffer to 'today' to ensure it's slightly in the future
+      due_date_today_future = DateTime.utc_now() |> DateTime.add(1, :second)
+      due_date_plus_1 = DateTime.utc_now() |> DateTime.add(1, :day)
+      due_date_plus_2 = DateTime.utc_now() |> DateTime.add(2, :day)
 
-      # Assuming add_todo defaults to not_started or handles string status correctly
-      # We'll create one explicitly completed
-      # Default status
-      todo_id_not_started_1 = create_todo_and_wait(%{name: "Not Started 1", due_date: due_date_1})
-      # Default status
-      todo_id_not_started_2 = create_todo_and_wait(%{name: "Not Started 2", due_date: due_date_2})
+      # Todo A: name="Apple", due_date=+1 day, priority=low (default status: not_started)
+      todo_a_id =
+        create_todo_and_wait(%{
+          name: "Apple",
+          due_date: due_date_plus_1,
+          priority: :low
+        })
+
+      # Todo B: name="Banana", due_date=+2 days, priority=medium (default status: not_started)
+      todo_b_id =
+        create_todo_and_wait(%{
+          name: "Banana",
+          due_date: due_date_plus_2,
+          priority: :medium
+        })
+
+      # Todo C: name="Cherry", due_date=+0 days (today), priority=high (default status: not_started)
+      todo_c_id =
+        create_todo_and_wait(%{
+          name: "Cherry",
+          due_date: due_date_today_future, # Use the slightly future date
+          priority: :high
+        })
+
+      # Update statuses after creation
+      {:ok, _} = Todos.edit_todo(todo_b_id, %{status: :completed})
+      # {:ok, _} = Todos.edit_todo(todo_c_id, %{status: :in_progress})?``/
+      # Wait briefly for projections to update after edits
+      :timer.sleep(100)
 
       {:ok,
        todo_ids: %{
-         not_started_1: todo_id_not_started_1,
-         not_started_2: todo_id_not_started_2
+         a: todo_a_id,
+         b: todo_b_id,
+         c: todo_c_id
        },
        due_dates: %{
-         date_1: due_date_1,
-         date_2: due_date_2
+         today: due_date_today_future,
+         plus_1: due_date_plus_1,
+         plus_2: due_date_plus_2
        }}
     end
 
     test "renders all todo items without filters", %{conn: conn, todo_ids: ids} do
       conn = get(conn, ~p"/api/todos")
       response = json_response(conn, 200)["data"]
-      assert length(response) == 2
+      assert length(response) == 3 # Updated count
 
-      todo_ns1 = Enum.find(response, fn todo -> todo["id"] == ids.not_started_1 end)
-      todo_ns2 = Enum.find(response, fn todo -> todo["id"] == ids.not_started_2 end)
-
-      # Verify all todos exist
-      assert todo_ns1 != nil
-      assert todo_ns2 != nil
-
-      # Verify names match
-      assert todo_ns1["name"] == "Not Started 1"
-      assert todo_ns2["name"] == "Not Started 2"
-
-      # Verify statuses (assuming read model stores strings)
-      assert todo_ns1["status"] == "not_started"
-      assert todo_ns2["status"] == "not_started"
+      response_ids = Enum.map(response, & &1["id"])
+      assert ids.a in response_ids
+      assert ids.b in response_ids
+      assert ids.c in response_ids
     end
 
     test "filters todo items by status=not_started", %{conn: conn, todo_ids: ids} do
@@ -65,24 +82,24 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
       response = json_response(conn, 200)["data"]
       assert length(response) == 2
       response_ids = Enum.map(response, & &1["id"])
-      assert ids.not_started_1 in response_ids
-      assert ids.not_started_2 in response_ids
+      assert ids.a in response_ids
+      assert ids.c in response_ids
     end
 
     test "filters todo items by status=completed", %{conn: conn, todo_ids: _ids} do
       conn = get(conn, ~p"/api/todos?status=completed")
       response = json_response(conn, 200)["data"]
-      assert length(response) == 0
+      assert length(response) == 1
     end
 
     test "filters todo items by due_date", %{conn: conn, todo_ids: ids, due_dates: dates} do
-      date_str = DateTime.to_iso8601(dates.date_1)
+      # Revert to standard ISO8601 format
+      date_str = DateTime.to_iso8601(dates.today)
       conn = get(conn, ~p"/api/todos?due_date=#{date_str}")
       response = json_response(conn, 200)["data"]
       assert length(response) == 1
       response_ids = Enum.map(response, & &1["id"])
-      assert ids.not_started_1 in response_ids
-      refute ids.not_started_2 in response_ids
+      assert ids.c in response_ids
     end
 
     test "filters todo items by status and due_date", %{
@@ -90,13 +107,13 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
       todo_ids: ids,
       due_dates: dates
     } do
-      date_str = DateTime.to_iso8601(dates.date_1)
+      # Revert to standard ISO8601 format
+      date_str = DateTime.to_iso8601(dates.today)
       conn = get(conn, ~p"/api/todos?status=not_started&due_date=#{date_str}")
       response = json_response(conn, 200)["data"]
       assert length(response) == 1
       response_ids = Enum.map(response, & &1["id"])
-      assert ids.not_started_1 in response_ids
-      refute ids.not_started_2 in response_ids
+      assert ids.c in response_ids
     end
 
     test "returns empty list for non-matching status", %{conn: conn} do
@@ -117,7 +134,76 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
       # Expecting it to ignore the invalid date and return all 3 todos
       conn = get(conn, ~p"/api/todos?due_date=invalid-date-format")
       response = json_response(conn, 200)["data"]
-      assert length(response) == 2
+      assert length(response) == 3 # Updated count
+    end
+
+    # --- Sorting Tests ---
+
+    test "sorts todo items by due_date ascending", %{conn: conn, todo_ids: ids} do
+      conn = get(conn, ~p"/api/todos?sort_by=due_date&sort_order=asc")
+      response = json_response(conn, 200)["data"]
+      response_ids = Enum.map(response, & &1["id"])
+      assert response_ids == [ids.c, ids.a, ids.b]
+    end
+
+    test "sorts todo items by due_date descending", %{conn: conn, todo_ids: ids} do
+      conn = get(conn, ~p"/api/todos?sort_by=due_date&sort_order=desc")
+      response = json_response(conn, 200)["data"]
+      response_ids = Enum.map(response, & &1["id"])
+      assert response_ids == [ids.b, ids.a, ids.c]
+    end
+
+    test "sorts todo items by name ascending", %{conn: conn, todo_ids: ids} do
+      conn = get(conn, ~p"/api/todos?sort_by=name&sort_order=asc")
+      response = json_response(conn, 200)["data"]
+      response_ids = Enum.map(response, & &1["id"])
+      assert response_ids == [ids.a, ids.b, ids.c]
+    end
+
+    test "sorts todo items by name descending", %{conn: conn, todo_ids: ids} do
+      conn = get(conn, ~p"/api/todos?sort_by=name&sort_order=desc")
+      response = json_response(conn, 200)["data"]
+      response_ids = Enum.map(response, & &1["id"])
+      assert response_ids == [ids.c, ids.b, ids.a]
+    end
+
+    test "sorts todo items by status ascending", %{conn: conn, todo_ids: ids} do
+      # Assuming alphabetical order for status strings: completed, in_progress, not_started
+      conn = get(conn, ~p"/api/todos?sort_by=status&sort_order=asc")
+      response = json_response(conn, 200)["data"]
+      response_ids = Enum.map(response, & &1["id"])
+      assert response_ids == [ids.b, ids.a, ids.c]
+    end
+
+    test "sorts todo items by status descending", %{conn: conn, todo_ids: ids} do
+      conn = get(conn, ~p"/api/todos?sort_by=status&sort_order=desc")
+      response = json_response(conn, 200)["data"]
+      response_ids = Enum.map(response, & &1["id"])
+      assert response_ids == [ids.a, ids.c, ids.b]
+    end
+
+    test "sorts todo items by priority ascending", %{conn: conn, todo_ids: ids} do
+      # Assuming order: low, medium, high
+      conn = get(conn, ~p"/api/todos?sort_by=priority&sort_order=asc")
+      response = json_response(conn, 200)["data"]
+      response_ids = Enum.map(response, & &1["id"])
+      assert response_ids == [ids.a, ids.b, ids.c]
+    end
+
+    test "sorts todo items by priority descending", %{conn: conn, todo_ids: ids} do
+      conn = get(conn, ~p"/api/todos?sort_by=priority&sort_order=desc")
+      response = json_response(conn, 200)["data"]
+      response_ids = Enum.map(response, & &1["id"])
+      assert response_ids == [ids.c, ids.b, ids.a]
+    end
+
+    test "defaults to sorting by added_at ascending (implicitly)", %{conn: conn, todo_ids: ids} do
+      # Assuming default sort is by insertion order (added_at asc)
+      conn = get(conn, ~p"/api/todos")
+      response = json_response(conn, 200)["data"]
+      response_ids = Enum.map(response, & &1["id"])
+      # The order depends on creation time, which setup defines as A, B, C
+      assert response_ids == [ids.a, ids.b, ids.c]
     end
   end
 

@@ -82,8 +82,8 @@ defmodule SleekFlowTodoWeb.TodoParamsParser do
   Returns a map like %{field: :field_atom, direction: :direction_atom} or nil.
   """
   def parse_index_sort(params) do
-    with field_str when is_binary(field_str) <- Map.get(params, "sort_field"),
-         direction_str when is_binary(direction_str) <- Map.get(params, "sort_direction"),
+    with field_str when is_binary(field_str) <- Map.get(params, "sort_by"),
+         direction_str when is_binary(direction_str) <- Map.get(params, "sort_order"),
          # Ensure atoms exist to prevent runtime errors
          {:ok, field_atom} <- safe_string_to_existing_atom(field_str),
          {:ok, direction_atom} <- safe_string_to_existing_atom(direction_str) do

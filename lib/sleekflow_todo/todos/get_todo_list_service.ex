@@ -77,6 +77,22 @@ defmodule SleekFlowTodo.Todos.GetTodoListService do
     order_by(query, ^order_by_opts)
   end
 
+  # Private helper to apply sorting (for :priority using fragment and dynamic)
+  defp apply_sorting(query, %{field: :priority, direction: direction})
+       when direction in [:asc, :desc] do
+    order_by_param =
+      {direction,
+       dynamic(
+         [t],
+         fragment(
+           "CASE ?.priority WHEN 'low' THEN 0 WHEN 'medium' THEN 1 WHEN 'high' THEN 2 ELSE 3 END",
+           t
+         )
+       )}
+
+    order_by(query, ^order_by_param)
+  end
+
   # Apply default sort if sort_opts are invalid or nil
   defp apply_sorting(query, _invalid_or_nil_sort_opts) do
     # Default sort by name ascending
