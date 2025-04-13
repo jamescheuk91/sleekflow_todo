@@ -3,9 +3,9 @@ defmodule SleekFlowTodoWeb.ActivityFeedController do
   use SleekFlowTodoWeb, :controller
   use PhoenixSwagger
 
+  alias PhoenixSwagger.Schema
   alias SleekFlowTodo.Activities
   alias SleekFlowTodoWeb.ActivityFeedJSON
-  alias PhoenixSwagger.Schema
 
   action_fallback SleekFlowTodoWeb.FallbackController
 

@@ -4,10 +4,10 @@ defmodule SleekFlowTodo.Todos do
   """
   require Logger
 
-  alias SleekFlowTodo.Todos.GetTodoListService
   alias SleekFlowTodo.Todos.AddTodoService
-  alias SleekFlowTodo.Todos.GetTodoItemService
   alias SleekFlowTodo.Todos.EditTodoService
+  alias SleekFlowTodo.Todos.GetTodoItemService
+  alias SleekFlowTodo.Todos.GetTodoListService
   alias SleekFlowTodo.Todos.RemoveTodoService
 
   @doc """

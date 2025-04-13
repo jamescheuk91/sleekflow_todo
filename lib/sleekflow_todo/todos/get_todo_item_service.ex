@@ -3,8 +3,8 @@ defmodule SleekFlowTodo.Todos.GetTodoItemService do
   Service for retrieving a single todo item by its ID from the read model.
   """
 
-  alias SleekFlowTodo.Todos.TodoReadModel
   alias SleekFlowTodo.ProjectionRepo
+  alias SleekFlowTodo.Todos.TodoReadModel
 
   @doc """
   Retrieves a single todo item by its ID from the read model.

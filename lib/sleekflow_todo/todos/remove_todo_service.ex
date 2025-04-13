@@ -4,8 +4,8 @@ defmodule SleekFlowTodo.Todos.RemoveTodoService do
   """
 
   require Logger
-  alias SleekFlowTodo.Todos.Commands.RemoveTodo
   alias SleekFlowTodo.CommandedApplication
+  alias SleekFlowTodo.Todos.Commands.RemoveTodo
 
   @doc """
   Dispatches a command to remove a todo item.

@@ -1,5 +1,8 @@
 # lib/sleekflow_todo/activities/activity_feed_projector.ex
 defmodule SleekFlowTodo.Activities.ActivityFeedProjector do
+  @moduledoc """
+  Projection responsible for creating ActivityFeedItemReadModel entries based on Todo events.
+  """
   use Commanded.Projections.Ecto,
     application: SleekFlowTodo.CommandedApplication,
     repo: SleekFlowTodo.ProjectionRepo,
@@ -8,9 +11,9 @@ defmodule SleekFlowTodo.Activities.ActivityFeedProjector do
 
   require Logger
 
+  alias SleekFlowTodo.Activities.ActivityFeedItemReadModel
   alias SleekFlowTodo.Todos.Events.TodoAdded
   alias SleekFlowTodo.Todos.Events.TodoEdited
-  alias SleekFlowTodo.Activities.ActivityFeedItemReadModel
 
   project(%TodoAdded{} = event, metadata, fn multi ->
     details = Map.take(event, [:name, :description, :status, :priority, :due_date, :tags])

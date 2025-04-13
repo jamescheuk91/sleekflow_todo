@@ -5,17 +5,17 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandler do
 
   require Logger
 
-  alias SleekFlowTodo.Todos.Commands.EditTodo
   alias SleekFlowTodo.Todos.Aggregates.Todo
+  alias SleekFlowTodo.Todos.Commands.EditTodo
 
   alias SleekFlowTodo.Todos.Validations.{
-    Validation,
-    NameValidator,
     DescriptionValidator,
     DueDateValidator,
+    NameValidator,
+    PriorityValidator,
     StatusValidator,
     TagsValidator,
-    PriorityValidator
+    Validation
   }
 
   def handle(aggregate, command) do

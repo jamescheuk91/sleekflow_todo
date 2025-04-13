@@ -70,7 +70,8 @@ defmodule SleekFlowTodo.MixProject do
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:earmark, "~> 1.4"},
       {:phoenix_swagger, "~> 0.8.3"},
-      {:ex_json_schema, "~> 0.5"}
+      {:ex_json_schema, "~> 0.5"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 

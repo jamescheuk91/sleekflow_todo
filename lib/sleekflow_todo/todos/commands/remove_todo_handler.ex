@@ -5,8 +5,8 @@ defmodule SleekFlowTodo.Todos.Commands.RemoveTodoHandler do
 
   require Logger
 
-  alias SleekFlowTodo.Todos.Commands.RemoveTodo
   alias SleekFlowTodo.Todos.Aggregates.Todo
+  alias SleekFlowTodo.Todos.Commands.RemoveTodo
 
   def handle(aggregate, command) do
     Logger.info("[RemoveTodoHandler] Received aggregate: #{inspect(aggregate)}")

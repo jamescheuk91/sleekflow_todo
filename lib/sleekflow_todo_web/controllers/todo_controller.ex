@@ -3,8 +3,8 @@ defmodule SleekFlowTodoWeb.TodoController do
   use PhoenixSwagger
   require Logger
   alias SleekFlowTodo.Todos
-  alias SleekFlowTodoWeb.TodoJSON
   alias SleekFlowTodoWeb.ErrorJSON
+  alias SleekFlowTodoWeb.TodoJSON
   alias SleekFlowTodoWeb.TodoParamsParser
 
   action_fallback SleekFlowTodoWeb.FallbackController
