@@ -13,6 +13,7 @@ defmodule SleekFlowTodo.Todos.TodoReadModel do
     field :description, :string
     # Using string representation for flexibility in read model consumers
     field :status, Ecto.Enum, values: [:not_started, :in_progress, :completed]
+    field :priority, Ecto.Enum, values: [:low, :medium, :high]
     field :due_date, :utc_datetime_usec
     field :tags, {:array, :string}
     field :added_at, :utc_datetime_usec
@@ -24,7 +25,9 @@ defmodule SleekFlowTodo.Todos.TodoReadModel do
   @doc false
   def changeset(todo, attrs) do
     todo
-    |> cast(attrs, [:name, :description, :status, :due_date, :tags])
+    |> cast(attrs, [:name, :description, :status, :priority, :due_date, :tags])
     |> validate_required([:name, :status, :added_at])
+    # Validate priority is one of the allowed values
+    |> validate_inclusion(:priority, [:low, :medium, :high])
   end
 end

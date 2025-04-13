@@ -8,12 +8,13 @@ defmodule SleekFlowTodo.Todos.Aggregates.TodoTest do
   test "add_todo/6 returns TodoAdded event" do
     todo_id = Commanded.UUID.uuid4()
     next_day = DateTime.add(DateTime.utc_now(), 1, :day)
+    priority = :high
     now = DateTime.utc_now()
     tags = ["tag1", "tag2"]
 
     assert %TodoAdded{} =
              event =
-             Todo.add(%Todo{}, todo_id, "Buy milk", "Buy milk description", next_day, tags, now)
+             Todo.add(%Todo{}, todo_id, "Buy milk", "Buy milk description", next_day, priority, tags, now)
 
     assert event.todo_id == todo_id
     assert event.name == "Buy milk"
@@ -22,6 +23,7 @@ defmodule SleekFlowTodo.Todos.Aggregates.TodoTest do
     assert event.added_at == now
     assert event.status == :not_started
     assert event.tags == tags
+    assert event.priority == priority
   end
 
   test "apply/2 TodoAdded event to Todo aggregate" do

@@ -211,5 +211,61 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandlerTest do
       assert {:error, errors} = EditTodoHandler.handle(@initial_aggregate_state, command)
       assert errors == expected_errors
     end
+
+    # Priority Tests
+    test "successfully edits priority to :low" do
+      command = %EditTodo{todo_id: @valid_todo_id, priority: :low}
+      expected_event = %TodoEdited{todo_id: @valid_todo_id, priority: :low}
+      assert {:ok, event} = EditTodoHandler.handle(@initial_aggregate_state, command)
+      # Check only the priority field in the event
+      assert event.priority == expected_event.priority
+    end
+
+    test "successfully edits priority to :medium" do
+      command = %EditTodo{todo_id: @valid_todo_id, priority: :medium}
+      expected_event = %TodoEdited{todo_id: @valid_todo_id, priority: :medium}
+      assert {:ok, event} = EditTodoHandler.handle(@initial_aggregate_state, command)
+      assert event.priority == expected_event.priority
+    end
+
+    test "successfully edits priority to :high" do
+      command = %EditTodo{todo_id: @valid_todo_id, priority: :high}
+      expected_event = %TodoEdited{todo_id: @valid_todo_id, priority: :high}
+      assert {:ok, event} = EditTodoHandler.handle(@initial_aggregate_state, command)
+      assert event.priority == expected_event.priority
+    end
+
+    test "successfully edits with priority as nil (no change)" do
+      command = %EditTodo{todo_id: @valid_todo_id, priority: nil}
+      expected_event = %TodoEdited{todo_id: @valid_todo_id, priority: nil}
+      assert {:ok, event} = EditTodoHandler.handle(@initial_aggregate_state, command)
+      assert event.priority == expected_event.priority
+    end
+
+    test "returns error for invalid priority atom" do
+      command = %EditTodo{todo_id: @valid_todo_id, priority: :urgent}
+      expected_error = {:error, {:priority, "Priority must be one of: [:low, :medium, :high]"}}
+      assert expected_error == EditTodoHandler.handle(@initial_aggregate_state, command)
+    end
+
+    test "returns error for invalid priority type" do
+      command = %EditTodo{todo_id: @valid_todo_id, priority: "medium"}
+      expected_error = {:error, {:priority, "Priority must be one of: [:low, :medium, :high]"}}
+      assert expected_error == EditTodoHandler.handle(@initial_aggregate_state, command)
+    end
+
+    test "returns multiple errors including invalid priority" do
+      command = %EditTodo{
+        todo_id: @valid_todo_id,
+        name: "N", # Invalid
+        priority: :invalid # Invalid
+      }
+      expected_errors = [
+        {:name, "Name must be at least 2 characters"},
+        {:priority, "Priority must be one of: [:low, :medium, :high]"}
+      ]
+      assert {:error, errors} = EditTodoHandler.handle(@initial_aggregate_state, command)
+      assert errors == expected_errors
+    end
   end
 end

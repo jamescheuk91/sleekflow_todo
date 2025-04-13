@@ -11,6 +11,7 @@ defmodule SleekFlowTodo.Todos.Events.TodoAdded do
     field :name, String.t()
     field :description, String.t()
     field :status, Ecto.Enum, values: [:not_started, :in_progress, :completed]
+    field :priority, atom()
     field :due_date, DateTime.t()
     field :tags, list(String.t()), default: []
     field :added_at, DateTime.t(), enforce: true

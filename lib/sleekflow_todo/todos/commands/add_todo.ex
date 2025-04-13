@@ -11,6 +11,7 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodo do
     field :name, String.t(), enforce: true
     field :description, String.t()
     field :due_date, DateTime.t()
+    field :priority, atom()
     field :tags, list(String.t()), default: []
     field :added_at, DateTime.t(), enforce: true
   end

@@ -13,12 +13,17 @@ defmodule SleekFlowTodo.Todos.TodoReadModelProjector do
   alias SleekFlowTodo.Todos.TodoReadModel
 
   project(%TodoAdded{} = event, _metadata, fn multi ->
+    # Convert status/priority strings from event data to atoms if necessary
+    status_atom = if is_binary(event.status), do: String.to_existing_atom(event.status), else: event.status
+    priority_atom = if is_binary(event.priority), do: String.to_existing_atom(event.priority), else: event.priority
+
     # Use the parsed DateTime structs when creating the TodoReadModel
     struct = %TodoReadModel{
       id: event.todo_id,
       name: event.name,
       description: event.description,
-      status: String.to_existing_atom(event.status),
+      status: status_atom,
+      priority: priority_atom,
       due_date: event.due_date,
       tags: event.tags,
       added_at: event.added_at
@@ -41,6 +46,16 @@ defmodule SleekFlowTodo.Todos.TodoReadModelProjector do
         status_str when is_binary(status_str) -> String.to_existing_atom(status_str)
         # Keep it if it's already an atom
         atom when is_atom(atom) -> atom
+      end)
+      |> Map.update(:priority, nil, fn
+        # Keep it nil if it's nil initially
+        nil -> nil
+        # Convert if it's a string
+        priority_str when is_binary(priority_str) -> String.to_existing_atom(priority_str)
+        # Keep it if it's already an atom (should always be)
+        atom when is_atom(atom) -> atom
+        # Log if it's somehow not an atom (should not happen)
+        _ -> Logger.warning("Unexpected priority format in TodoEdited event: #{inspect(event.priority)}"); nil
       end)
       # Filter out keys where the value is nil *after* potential status conversion
       |> Enum.reject(fn {_, v} -> is_nil(v) end)

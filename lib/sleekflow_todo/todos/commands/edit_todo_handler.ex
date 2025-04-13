@@ -17,7 +17,8 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandler do
       &validate_description/1,
       &validate_due_date/1,
       &validate_status/1,
-      &validate_tags/1
+      &validate_tags/1,
+      &validate_priority/1
     ]
 
     case validate(command, validators) do
@@ -28,10 +29,11 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandler do
           description: description,
           due_date: due_date,
           status: status,
+          priority: priority,
           tags: tags
         } = command
 
-        result = Todo.edit(aggregate, todo_id, name, description, due_date, status, tags)
+        result = Todo.edit(aggregate, todo_id, name, description, due_date, status, priority, tags)
         {:ok, result}
 
       {:error, error_details} ->
@@ -136,6 +138,18 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandler do
 
       true ->
         {:error, {:tags, "Tags must be a list of strings"}}
+    end
+  end
+
+  # Validate priority - allow nil, otherwise must be low, medium or high
+  defp validate_priority(%EditTodo{priority: nil}), do: :ok
+
+  defp validate_priority(%EditTodo{priority: priority}) do
+    allowed_priorities = [:low, :medium, :high]
+    if Enum.member?(allowed_priorities, priority) do
+      :ok
+    else
+      {:error, {:priority, "Priority must be one of: #{inspect(allowed_priorities)}"}}
     end
   end
 end

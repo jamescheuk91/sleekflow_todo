@@ -21,6 +21,7 @@ defmodule SleekFlowTodoWeb.TodoJSON do
       name: todo.name,
       description: todo.description,
       status: todo.status,
+      priority: todo.priority,
       due_date: todo.due_date,
       added_at: todo.added_at,
       tags: todo.tags,

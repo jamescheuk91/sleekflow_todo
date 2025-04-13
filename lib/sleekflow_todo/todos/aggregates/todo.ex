@@ -15,6 +15,7 @@ defmodule SleekFlowTodo.Todos.Aggregates.Todo do
     :description,
     :due_date,
     :status,
+    :priority,
     :tags,
     :added_at,
     :updated_at,
@@ -27,6 +28,7 @@ defmodule SleekFlowTodo.Todos.Aggregates.Todo do
           description: String.t() | nil,
           due_date: DateTime.t() | nil,
           status: :not_started | :in_progress | :completed,
+          priority: :low | :medium | :high,
           tags: list(String.t()) | nil,
           added_at: DateTime.t() | nil,
           updated_at: DateTime.t() | nil,
@@ -39,11 +41,12 @@ defmodule SleekFlowTodo.Todos.Aggregates.Todo do
         name,
         description,
         due_date,
+        priority,
         tags,
         added_at
       ) do
     Logger.debug(
-      "[Todo.add] Params: todo_id=#{todo_id}, name=#{name}, description=#{description}, due_date=#{inspect(due_date)}, tags=#{inspect(tags)}, added_at=#{inspect(added_at)}"
+      "[Todo.add] Params: todo_id=#{todo_id}, name=#{name}, description=#{description}, due_date=#{inspect(due_date)}, priority=#{inspect(priority)}, tags=#{inspect(tags)}, added_at=#{inspect(added_at)}"
     )
 
     %TodoAdded{
@@ -51,6 +54,7 @@ defmodule SleekFlowTodo.Todos.Aggregates.Todo do
       name: name,
       description: description,
       status: :not_started,
+      priority: priority,
       due_date: due_date,
       tags: tags,
       added_at: added_at
@@ -64,10 +68,11 @@ defmodule SleekFlowTodo.Todos.Aggregates.Todo do
         description,
         due_date,
         status,
+        priority,
         tags
       ) do
     Logger.debug(
-      "[Todo.edit] Params: todo_id: #{todo_id}, name: #{name}, description: #{description}, due_date: #{inspect(due_date)}, status: #{status}, tags: #{inspect(tags)}"
+      "[Todo.edit] Params: todo_id: #{todo_id}, name: #{name}, description: #{description}, due_date: #{inspect(due_date)}, status: #{status}, priority: #{priority}, tags: #{inspect(tags)}"
     )
 
     %TodoEdited{
@@ -76,6 +81,7 @@ defmodule SleekFlowTodo.Todos.Aggregates.Todo do
       description: description,
       due_date: due_date,
       status: status,
+      priority: priority,
       tags: tags
     }
   end
@@ -95,6 +101,7 @@ defmodule SleekFlowTodo.Todos.Aggregates.Todo do
         description: event.description,
         due_date: event.due_date,
         status: event.status,
+        priority: event.priority,
         tags: event.tags,
         added_at: event.added_at
     }
@@ -111,6 +118,7 @@ defmodule SleekFlowTodo.Todos.Aggregates.Todo do
         description: event.description || state.description,
         due_date: event.due_date || state.due_date,
         status: event.status || state.status,
+        priority: event.priority || state.priority,
         tags: updated_tags,
         updated_at: DateTime.utc_now()
     }

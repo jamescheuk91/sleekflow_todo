@@ -23,6 +23,8 @@ defmodule SleekFlowTodoWeb.TodoController do
     params = SleekFlowTodo.Utils.key_to_atom(todo_params)
     # Convert due_date from string to DateTime if present
     params = parse_due_date(params)
+    # Convert priority from string to atom if present
+    params = parse_priority(params)
 
     with {:ok, todo_id} <- Todos.add_todo(params),
          todo <- Todos.get_todo!(todo_id) do
@@ -69,6 +71,9 @@ defmodule SleekFlowTodoWeb.TodoController do
         params = SleekFlowTodo.Utils.key_to_atom(todo_params)
         # Convert due_date from string to DateTime if present
         params = parse_due_date(params)
+        # Convert priority from string to atom if present
+        params = parse_priority(params)
+        params = parse_status(params)
 
         with {:ok, todo_id} <- Todos.edit_todo(id, params),
              # Fetch the updated todo state after the command is processed
@@ -121,6 +126,29 @@ defmodule SleekFlowTodoWeb.TodoController do
         {:error, reason} ->
           # Keep the original value, the validation in the command will handle the error
           Logger.error("Failed to parse due_date: #{inspect(reason)}")
+          params
+      end
+    else
+      params
+    end
+  end
+
+  defp parse_status(params) do
+    if Map.has_key?(params, :status) and is_binary(params.status) do
+      Map.put(params, :status, String.to_existing_atom(params.status))
+    else
+      params
+    end
+  end
+
+  defp parse_priority(params) do
+    if Map.has_key?(params, :priority) and is_binary(params.priority) do
+      case String.to_existing_atom(params.priority) do
+        atom when is_atom(atom) ->
+          Map.put(params, :priority, atom)
+        _ ->
+          # Keep original value, validation will handle it
+          Logger.error("Invalid priority string received: #{inspect(params.priority)}")
           params
       end
     else

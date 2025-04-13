@@ -297,4 +297,67 @@ defmodule SleekFlowTodo.Todos.Commands.AddTodoHandlerTest do
               {:tags, "Tags must be a list of strings"}
             ]} = AddTodoHandler.handle(aggregate, command)
   end
+
+  # Priority Tests
+  test "handle/2 AddTodo command with valid priority :low" do
+    command = %AddTodo{
+      todo_id: Commanded.UUID.uuid4(),
+      name: "Test Priority Low",
+      priority: :low,
+      added_at: DateTime.utc_now()
+    }
+    assert {:ok, %TodoAdded{priority: :low}} = AddTodoHandler.handle(%Todo{}, command)
+  end
+
+  test "handle/2 AddTodo command with valid priority :medium" do
+    command = %AddTodo{
+      todo_id: Commanded.UUID.uuid4(),
+      name: "Test Priority Medium",
+      priority: :medium,
+      added_at: DateTime.utc_now()
+    }
+    assert {:ok, %TodoAdded{priority: :medium}} = AddTodoHandler.handle(%Todo{}, command)
+  end
+
+  test "handle/2 AddTodo command with valid priority :high" do
+    command = %AddTodo{
+      todo_id: Commanded.UUID.uuid4(),
+      name: "Test Priority High",
+      priority: :high,
+      added_at: DateTime.utc_now()
+    }
+    assert {:ok, %TodoAdded{priority: :high}} = AddTodoHandler.handle(%Todo{}, command)
+  end
+
+  test "handle/2 AddTodo command with nil priority (default)" do
+    command = %AddTodo{
+      todo_id: Commanded.UUID.uuid4(),
+      name: "Test Nil Priority",
+      priority: nil,
+      added_at: DateTime.utc_now()
+    }
+    assert {:ok, %TodoAdded{priority: nil}} = AddTodoHandler.handle(%Todo{}, command)
+  end
+
+  test "handle/2 AddTodo command fails with invalid priority atom" do
+    command = %AddTodo{
+      todo_id: Commanded.UUID.uuid4(),
+      name: "Test Invalid Priority",
+      priority: :critical, # Invalid atom
+      added_at: DateTime.utc_now()
+    }
+    expected_error = {:error, {:priority, "Priority must be one of: [:low, :medium, :high]"}}
+    assert expected_error == AddTodoHandler.handle(%Todo{}, command)
+  end
+
+  test "handle/2 AddTodo command fails with invalid priority type" do
+    command = %AddTodo{
+      todo_id: Commanded.UUID.uuid4(),
+      name: "Test Invalid Priority Type",
+      priority: "high", # Invalid type (string)
+      added_at: DateTime.utc_now()
+    }
+    expected_error = {:error, {:priority, "Priority must be one of: [:low, :medium, :high]"}}
+    assert expected_error == AddTodoHandler.handle(%Todo{}, command)
+  end
 end

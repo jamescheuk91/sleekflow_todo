@@ -145,7 +145,8 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
         name: "Test Todo",
         description: "Test Description",
         due_date: due_date_string,
-        tags: ["test1"]
+        tags: ["test1"],
+        priority: "high"
       }
 
       conn = post(conn, ~p"/api/todos", todo: attrs)
@@ -159,6 +160,7 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
       assert response["added_at"]
       assert response["updated_at"]
       assert response["tags"] == ["test1"]
+      assert response["priority"] == "high"
     end
 
     test "renders error when name is missing", %{conn: conn} do
@@ -217,7 +219,8 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
         name: "Show Me",
         description: "This is the description",
         due_date: due_date,
-        tags: ["test1"]
+        tags: ["test1"],
+        priority: :high
       }
 
       todo_id = create_todo_and_wait(attrs)
@@ -230,6 +233,7 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
       assert response["status"] == "not_started"
       assert response["due_date"] == due_date_string
       assert response["tags"] == ["test1"]
+      assert response["priority"] == "high"
     end
 
     test "returns 404 when todo does not exist", %{conn: conn} do
@@ -243,7 +247,7 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
   describe "edit todo" do
     setup do
       # Create a todo to be edited
-      attrs = %{name: "Edit Me", description: "This is the description"}
+      attrs = %{name: "Edit Me", description: "This is the description", priority: :high}
       todo_id = create_todo_and_wait(attrs)
       {:ok, todo_id: todo_id}
     end
@@ -255,7 +259,8 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
         name: "Updated Name",
         description: "Updated Description",
         status: :completed,
-        due_date: due_date_string
+        due_date: due_date_string,
+        priority: "low"
       }
 
       conn = put(conn, ~p"/api/todos/#{id}", todo: update_attrs)
@@ -266,6 +271,7 @@ defmodule SleekFlowTodoWeb.TodoControllerTest do
       assert response["description"] == "Updated Description"
       assert response["status"] == "completed"
       assert response["due_date"] == due_date_string
+      assert response["priority"] == "low"
     end
 
     test "renders updated todo with partial data", %{conn: conn, todo_id: id} do
