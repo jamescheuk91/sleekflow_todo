@@ -20,50 +20,74 @@ defmodule SleekFlowTodoWeb.TodoController do
       status(:query, :array, "Status filter",
         items: [type: :string, enum: [:not_started, :in_progress, :completed]]
       )
+
       due_date(:query, :string, "DateTime in ISO8601", example: "2025-04-15T15:25:11.550132Z")
       sort_by(:query, :string, "Sort by", example: "priority")
       sort_order(:query, :string, "Sort order", example: "asc")
     end
+
+    response(200, "Success")
+  end
+
+  swagger_path :show do
+    get("/todos/:id")
+    summary("Show a specific todo")
+    description("Retrieve a specific todo item by its ID")
+    produces(["application/json"])
+    tag("Todos")
+
+    parameters do
+      id(:path, :string, "Todo ID",
+        required: true,
+        example: "02ef07e0-eb4f-4fca-b6aa-c7993427cc10"
+      )
+    end
+
+    response(200, "OK", Schema.ref(:Todo))
+    response(404, "Not Found")
   end
 
   def swagger_definitions do
     %{
-      Todo: swagger_schema do
-        title "Todo"
-        description "A todo item"
-        properties do
-          id :string, "Unique identifier", required: true
-          name :string, "todo item name", required: true
-          status :string, "todo item status", required: true
-          due_date :string, "todo item due date", required: false
-          priority :string, "todo item priority", required: false
-          description :string, "todo item description", required: false
-          tags :array, "todo item tags", required: false
-          updated_at :string, "todo item updated at", required: false
-          added_at :string, "todo item added at", required: false
+      Todo:
+        swagger_schema do
+          title("Todo")
+          description("A todo item")
 
-        end
-        example %{
-          id: "02ef07e0-eb4f-4fca-b6aa-c7993427cc10",
-          name: "test new",
-          priority: "high",
-          status: "in_progress",
-          description: "description new",
-          tags: [
+          properties do
+            id(:string, "Unique identifier", required: true)
+            name(:string, "todo item name", required: true)
+            status(:string, "todo item status", required: true)
+            due_date(:string, "todo item due date", required: false)
+            priority(:string, "todo item priority", required: false)
+            description(:string, "todo item description", required: false)
+            tags(:array, "todo item tags", required: false)
+            updated_at(:string, "todo item updated at", required: false)
+            added_at(:string, "todo item added at", required: false)
+          end
+
+          example(%{
+            id: "02ef07e0-eb4f-4fca-b6aa-c7993427cc10",
+            name: "test new",
+            priority: "high",
+            status: "in_progress",
+            description: "description new",
+            tags: [
               "test1",
-            "test3"
-          ],
-          updated_at: "2025-04-13T07:05:25.345643Z",
-          due_date: "2025-04-14T15:28:42.596658Z",
-          added_at: "2025-04-09T11:25:30.867826Z"
-        }
-      end,
-      Todos: swagger_schema do
-        title "Todos"
-        description "A collection of Todos"
-        type :array
-        items Schema.ref(:Todo)
-      end
+              "test3"
+            ],
+            updated_at: "2025-04-13T07:05:25.345643Z",
+            due_date: "2025-04-14T15:28:42.596658Z",
+            added_at: "2025-04-09T11:25:30.867826Z"
+          })
+        end,
+      Todos:
+        swagger_schema do
+          title("Todos")
+          description("A collection of Todos")
+          type(:array)
+          items(Schema.ref(:Todo))
+        end
     }
   end
 
