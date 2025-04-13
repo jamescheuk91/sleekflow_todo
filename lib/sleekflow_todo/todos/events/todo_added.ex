@@ -10,9 +10,9 @@ defmodule SleekFlowTodo.Todos.Events.TodoAdded do
     field :todo_id, String.t(), enforce: true
     field :name, String.t()
     field :description, String.t()
-    field :status, Ecto.Enum, values: [:not_started, :in_progress, :completed]
-    field :priority, atom()
-    field :due_date, DateTime.t()
+    field :status, :not_started | :in_progress | :completed
+    field :priority, :low | :medium | :high | nil
+    field :due_date, DateTime.t(), default: nil
     field :tags, list(String.t()), default: []
     field :added_at, DateTime.t(), enforce: true
   end
@@ -24,7 +24,12 @@ defimpl Commanded.Serialization.JsonDecoder, for: SleekFlowTodo.Todos.Events.Tod
   Handles optional due_date.
   """
   def decode(
-        %SleekFlowTodo.Todos.Events.TodoAdded{due_date: due_date, added_at: added_at} = event
+        %SleekFlowTodo.Todos.Events.TodoAdded{
+          due_date: due_date,
+          added_at: added_at,
+          status: status,
+          priority: priority
+        } = event
       ) do
     parsed_added_at =
       if is_binary(added_at) do
@@ -56,11 +61,40 @@ defimpl Commanded.Serialization.JsonDecoder, for: SleekFlowTodo.Todos.Events.Tod
           due_date
       end
 
+    parsed_status =
+      if is_binary(status) do
+        try do
+          String.to_existing_atom(status)
+        rescue
+          ArgumentError -> status # Keep original if not an existing atom
+        end
+      else
+        status # Keep original if not a string
+      end
+
+    parsed_priority =
+      cond do
+        is_binary(priority) ->
+          try do
+            String.to_existing_atom(priority)
+          rescue
+            ArgumentError -> priority # Keep original if not an existing atom
+          end
+
+        is_nil(priority) ->
+          nil # Keep nil
+
+        true ->
+          priority # Keep original otherwise
+      end
+
     # Return event with potentially updated fields
     %SleekFlowTodo.Todos.Events.TodoAdded{
       event
       | due_date: parsed_due_date,
-        added_at: parsed_added_at
+        added_at: parsed_added_at,
+        status: parsed_status,
+        priority: parsed_priority
     }
   end
 end

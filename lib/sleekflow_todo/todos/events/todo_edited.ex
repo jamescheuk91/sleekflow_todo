@@ -22,7 +22,13 @@ defimpl Commanded.Serialization.JsonDecoder, for: SleekFlowTodo.Todos.Events.Tod
   Decode date strings into DateTime structs after JSON deserialization.
   Handles optional due_date.
   """
-  def decode(%SleekFlowTodo.Todos.Events.TodoEdited{due_date: due_date} = event) do
+  def decode(
+        %SleekFlowTodo.Todos.Events.TodoEdited{
+          due_date: due_date,
+          status: status,
+          priority: priority
+        } = event
+      ) do
     parsed_due_date =
       cond do
         is_binary(due_date) ->
@@ -41,10 +47,39 @@ defimpl Commanded.Serialization.JsonDecoder, for: SleekFlowTodo.Todos.Events.Tod
           due_date
       end
 
+    parsed_status =
+      if is_binary(status) do
+        try do
+          String.to_existing_atom(status)
+        rescue
+          ArgumentError -> status # Keep original if not an existing atom
+        end
+      else
+        status # Keep original if not a string
+      end
+
+    parsed_priority =
+      cond do
+        is_binary(priority) ->
+          try do
+            String.to_existing_atom(priority)
+          rescue
+            ArgumentError -> priority # Keep original if not an existing atom
+          end
+
+        is_nil(priority) ->
+          nil # Keep nil
+
+        true ->
+          priority # Keep original otherwise
+      end
+
     # Return event with potentially updated fields
     %SleekFlowTodo.Todos.Events.TodoEdited{
       event
-      | due_date: parsed_due_date
+      | due_date: parsed_due_date,
+        status: parsed_status,
+        priority: parsed_priority
     }
   end
 end
