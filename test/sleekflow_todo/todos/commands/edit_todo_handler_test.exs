@@ -75,7 +75,7 @@ defmodule SleekFlowTodo.Todos.Commands.EditTodoHandlerTest do
         status: :not_started
       }
 
-      assert {:error, {:name, "Name is required"}} =
+      assert {:error, {:name, "Name cannot be empty"}} =
                EditTodoHandler.handle(@initial_aggregate_state, command)
     end
 
