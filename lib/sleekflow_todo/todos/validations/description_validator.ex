@@ -3,10 +3,15 @@ defmodule SleekFlowTodo.Todos.Validations.DescriptionValidator do
   Validation logic for the 'description' field.
   """
 
-  def validate_description_optional(%{description: nil}), do: :ok
+  def validate_description_optional(params) do
+    case Map.get(params, :description) do
+      nil ->
+        :ok
 
-  def validate_description_optional(%{description: description}),
-    do: validate_description_format(description)
+      description ->
+        validate_description_format(description)
+    end
+  end
 
   defp validate_description_format(description) do
     if is_binary(description) and String.length(description) >= 2 do
