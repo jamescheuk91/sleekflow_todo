@@ -5,7 +5,49 @@
   },
   "host": "localhost:4000",
   "definitions": {},
-  "paths": {},
+  "paths": {
+    "/todos": {
+      "get": {
+        "description": "Retrieve a list of all todos",
+        "operationId": "SleekFlowTodoWeb.TodoController.index",
+        "parameters": [
+          {
+            "description": "Status filter",
+            "in": "query",
+            "items": {
+              "enum": [
+                "not_started",
+                "in_progress",
+                "completed"
+              ],
+              "type": "string"
+            },
+            "name": "status",
+            "required": false,
+            "type": "array"
+          },
+          {
+            "description": "DateTime in ISO8601",
+            "in": "query",
+            "name": "due_date",
+            "required": false,
+            "type": "string",
+            "x-example": "2025-04-15T15:25:11.550132Z"
+          }
+        ],
+        "produces": [
+          [
+            "application/json"
+          ]
+        ],
+        "responses": {},
+        "summary": "List all todos",
+        "tags": [
+          "Todos"
+        ]
+      }
+    }
+  },
   "swagger": "2.0",
   "basePath": "/api",
   "consumes": [

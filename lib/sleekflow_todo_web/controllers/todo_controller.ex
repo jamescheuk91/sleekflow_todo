@@ -1,5 +1,6 @@
 defmodule SleekFlowTodoWeb.TodoController do
   use SleekFlowTodoWeb, :controller
+  use PhoenixSwagger
   require Logger
   alias SleekFlowTodo.Todos
   alias SleekFlowTodoWeb.TodoJSON
@@ -7,6 +8,19 @@ defmodule SleekFlowTodoWeb.TodoController do
   alias SleekFlowTodoWeb.TodoParamsParser
 
   action_fallback SleekFlowTodoWeb.FallbackController
+
+  swagger_path :index do
+    get("/todos")
+    summary("List all todos")
+    description("Retrieve a list of all todos")
+    produces(["application/json"])
+    tag("Todos")
+    parameters do
+      status(:query, :array, "Status filter",
+      items: [type: :string, enum: [:not_started, :in_progress, :completed]])
+      due_date(:query, :string, "DateTime in ISO8601", example: "2025-04-15T15:25:11.550132Z")
+    end
+  end
 
   def index(conn, params) do
     filters = TodoParamsParser.parse_index_filters(params)
