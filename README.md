@@ -30,6 +30,11 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
 mix docs
 """
 
+## view swagger API docs
+"""
+localhost:4000/api/swagger
+"""
+
 ## SSH Into Remote Console
 """
 fly ssh console --pty -C "/app/bin/sleekflow_todo remote"
